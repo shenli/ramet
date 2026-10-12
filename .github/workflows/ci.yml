@@ -1,0 +1,79 @@
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        go: ["1.26.x", "1.27.x"]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: make check
+      - run: go test -run '^$' -fuzz FuzzManifestPaths -fuzztime 10s ./engine
+      - run: ./bin/ramet demo --concurrency 8 --iterations 100
+      - name: Keep private planning files out of releases
+        run: test -z "$(git ls-files docs/ramet-marketing-internal.md docs/phase-1-plan.md docs/phase-2-plan.md)"
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: python -m pip install build
+      - run: python -m build sdk/python
+      - run: docker build -t ramet:ci .
+      - name: Container lifecycle smoke test
+        run: docker run --rm --entrypoint ramet ramet:ci demo --concurrency 4 --iterations 20
+      - run: make build
+      - run: docker pull python:3.12-slim-bookworm
+      - name: Docker adapter lifecycle
+        run: RAMET_TEST_DOCKER=1 PYTHONPATH=sdk/python:sdk/python/tests python -m unittest test_integration.IntegrationTests.test_docker_timeout_isolation_and_recycle test_integration.IntegrationTests.test_docker_stops_on_expired_lease test_integration.IntegrationTests.test_docker_bounds_combined_output_and_recycles -v
+      - name: Selective persistence and verified reconstruction
+        run: PYTHONPATH=sdk/python python examples/persistence/run.py --docker
+      - name: Best-of-N coding workflow
+        run: |
+          PYTHONPATH=sdk/python python examples/best_of_n/run.py --output .test-cache/coding-demo
+          git -C .test-cache/coding-demo/source apply --check ../winner.patch
+  durable-providers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: docker compose -p ramet-phase1-test -f compose.integration.yaml up -d --build --wait
+      - name: Enable native FUSE tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fuse3
+          sudo modprobe fuse
+          sudo chmod 666 /dev/fuse
+      - name: Native FUSE lifecycle
+        run: RAMET_TEST_FUSE=1 go test -race -count=1 -timeout=3m -v -run TestLazy ./engine
+      - run: make build
+      - name: Python lifecycle on FUSE
+        run: RAMET_TEST_BACKEND=lazy PYTHONPATH=sdk/python python -m unittest discover -s sdk/python/tests -v
+      - run: RAMET_TEST_FUSE=1 ./scripts/test-integration.sh
+      - if: always()
+        run: docker compose -p ramet-phase1-test -f compose.integration.yaml down

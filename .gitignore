@@ -1,0 +1,17 @@
+/docs/ramet-marketing-internal.md
+/docs/phase-1-plan.md
+/docs/phase-2-plan.md
+/.ramet/
+/bin/
+/coverage.out
+/benchmark-results/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+/sdk/python/build/
+/sdk/python/dist/
+.DS_Store
+/.test-services/
+/.test-cache/
+/test-sessions/

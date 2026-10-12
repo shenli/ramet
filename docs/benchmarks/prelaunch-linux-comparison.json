@@ -1,0 +1,79 @@
+{
+  "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.35",
+  "python": "3.10.12",
+  "git": "git version 2.34.1",
+  "logical_source_bytes": 8388608,
+  "files": 128,
+  "attempts": 16,
+  "concurrency": 4,
+  "capture_seconds": 3.6497335927560925,
+  "worker": {
+    "ok": true,
+    "format": 2,
+    "copy_on_write": false,
+    "snapshots": 1,
+    "objects": 279,
+    "problems": [],
+    "durability": "local"
+  },
+  "results": [
+    {
+      "strategy": "full-copy",
+      "prepare_seconds": {
+        "median": 0.04979667440056801,
+        "max": 0.09160227794200182,
+        "p95": 0.09160227794200182
+      },
+      "reset_seconds": {
+        "median": 0.05910783028230071,
+        "max": 0.07153479009866714,
+        "p95": 0.07153479009866714
+      },
+      "wall_seconds": 0.608168987557292,
+      "cycles_per_second": 26.308477293891503,
+      "verified_cycles": 16,
+      "verification_failures": 0
+    },
+    {
+      "strategy": "git-worktree",
+      "prepare_seconds": {
+        "median": 0.013380581047385931,
+        "max": 0.01790815219283104,
+        "p95": 0.01790815219283104
+      },
+      "reset_seconds": {
+        "median": 0.014290315564721823,
+        "max": 0.025963173247873783,
+        "p95": 0.025963173247873783
+      },
+      "wall_seconds": 0.19462373200803995,
+      "cycles_per_second": 82.20991260890546,
+      "verified_cycles": 16,
+      "verification_failures": 0
+    },
+    {
+      "strategy": "ramet",
+      "prepare_seconds": {
+        "median": 0.024308341089636087,
+        "max": 0.03984159789979458,
+        "p95": 0.03984159789979458
+      },
+      "reset_seconds": {
+        "median": 0.049505113158375025,
+        "max": 0.06555547472089529,
+        "p95": 0.06555547472089529
+      },
+      "wall_seconds": 0.5502012865617871,
+      "cycles_per_second": 29.08026642391941,
+      "verified_cycles": 16,
+      "verification_failures": 0
+    }
+  ],
+  "limitations": [
+    "Fixed strategy order; host page cache is not flushed. These are warm-host measurements.",
+    "Git worktrees share repository metadata and do not provide independent Git state.",
+    "Full copies use Python copytree; filesystem copy acceleration may apply.",
+    "Wall time includes verification and cleanup; prepare/reset timers exclude the common verifier.",
+    "No physical shared-extent, cold-cache, remote-I/O, or agent-runtime claim."
+  ]
+}

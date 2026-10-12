@@ -1,0 +1,16 @@
+.git
+.ramet
+bin
+benchmark-results
+docs/ramet-marketing-internal.md
+docs/phase-1-plan.md
+docs/phase-2-plan.md
+**/__pycache__
+**/*.egg-info
+**/.venv
+**/dist
+**/build
+.DS_Store
+.test-services
+.test-cache
+test-sessions

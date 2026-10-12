@@ -1,0 +1,13 @@
+server:
+  token_env: RAMET_TENANT_B_TOKEN
+  max_inflight: 32
+worker:
+  data: /var/lib/ramet/tenant-b
+  backend: copy
+  max_executions: 64
+  max_pools: 16
+  max_idle_executions: 16
+  idle_ttl: 5m
+  min_free_disk_bytes: 1073741824
+  source_roots: []
+  git_repositories: []

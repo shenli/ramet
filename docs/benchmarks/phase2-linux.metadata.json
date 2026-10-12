@@ -1,0 +1,49 @@
+{
+  "date_utc": "2026-10-09",
+  "host": "dedicated-linux-test-host",
+  "test_directory": "~/work/ramet-phase2",
+  "filesystem": "ext4",
+  "copy_backend": "full-copy fallback; no reflink claim",
+  "base": {
+    "files": 64,
+    "file_bytes": 65536,
+    "total_bytes": 4194304
+  },
+  "workload": {
+    "threads": 8,
+    "tenants": [
+      "copy",
+      "lazy"
+    ],
+    "cache_bytes_per_tenant": 1048576,
+    "includes": [
+      "read/write/recycle",
+      "reset",
+      "fork",
+      "promotion/restore",
+      "prefetch",
+      "trim",
+      "GC",
+      "Docker resource isolation"
+    ]
+  },
+  "runs": [
+    {
+      "report": "phase2-linux-soak.json",
+      "go_version": "go1.26.8",
+      "description": "30-minute engine stability run started before patched toolchain update"
+    },
+    {
+      "report": "phase2-linux-release-smoke.json",
+      "go_version": "go1.26.9",
+      "description": "Patched release build repeated native FUSE, crash-recovery, full race/provider tests and 120-second pressure workload"
+    }
+  ],
+  "qualification": "Source hashes and binary hashes are embedded in each report. The sustained run and patched release use the same execution/cache/lazy implementation. A subsequent Git-only pack clone/copy change was covered by rerun Git and provider regressions; this directory-base soak does not exercise Git pack materialization. The release smoke overlapped the tail of the long run; these are shared-host workload measurements, not isolated backend microbenchmarks. Pinned trim requests intentionally returning 429 count as pressure, not workload failures. No long-run production SLO is asserted.",
+  "post_report_changes": [
+    "engine/git_objects.go",
+    "engine/git_objects_test.go",
+    "engine/lazy_test.go",
+    "server/server_test.go"
+  ]
+}

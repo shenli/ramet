@@ -1,0 +1,8 @@
+# Paths in tenant configuration files should be adapted for your host.
+server:
+  listen: 127.0.0.1:7433
+tenants:
+  - id: tenant-a
+    config: tenant-a.yaml
+  - id: tenant-b
+    config: tenant-b.yaml

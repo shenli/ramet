@@ -1,0 +1,457 @@
+{
+  "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.35",
+  "requested_seconds": 120,
+  "concurrency": 8,
+  "files": 64,
+  "file_bytes": 65536,
+  "cache_bytes_per_tenant": 1048576,
+  "source_hashes": {
+    "client/client.go": "6aabfba518deddb82f95d67713dc2351e1763549bf7a3115da9f68aed97d977f",
+    "cmd/ramet/main.go": "c61cbdc461e08e6b968b3d17372422051059c2f250e37a227599c93ed0891c03",
+    "cmd/ramet/main_test.go": "0eb484598c0a6e145b0afef62a787adda979633dfa44267c5320d2adb1b8fc9e",
+    "cmd/ramet/tenants.go": "c532f989ac66893fa0ab6817354588c7497c61d248d0f20ebef0e4d50e2411a7",
+    "engine/cache.go": "117950e4a612a6a72e5cd549faf457a19a22d1a2c44d007d69dc5d422289c5dc",
+    "engine/content.go": "81c9f36c95399c465e6f219ce1b1c3b8620e8553cde0342f91c4dc745ae40f23",
+    "engine/doc.go": "36c85a9fb4c80a2b942d4b5d25d983b96b98137c9482c709cd00813418568994",
+    "engine/execution_fs.go": "de4e05315a1fba6b6c4377af6026b6e1d771d447133724e0e1311322551d61da",
+    "engine/git.go": "a7b28538e03a41bdf095c9adaab9760b6decb42fad1c9863e94bc37330029622",
+    "engine/git_objects.go": "d5ca59ee11eda6a8d414cc82f60a23548463a45b1e12a6968a694a7cc0164a23",
+    "engine/git_objects_test.go": "1e098087500569b118e8da7930aa2ed2220d3443d8d4bd6c5c0bbb21de303ae6",
+    "engine/idle.go": "85d940c46b6a971590db705982a1dbeb247f8f1a2941e8936f93e4221a9bdcb9",
+    "engine/lazy_recovery_test.go": "192f772eef31f35caa4e17d4c3f91e600fce84c8ae1c41d31749f7837a427abc",
+    "engine/lazy_test.go": "75353b3b0d49eef9a971d2ae229912c53eb4eaaee7e2169561f0802f1b579cd4",
+    "engine/leases.go": "9368356cbefa888a63e30bf7eebd499ad2da47ae7e39743e2e9009ed84760ced",
+    "engine/leases_test.go": "fc1f2e3a80571071e10dd79638f3264abe7878e3bac03651cd90d5edaa62f999",
+    "engine/pool.go": "adc18d9fe3c1c77d4ce1515704b3cdd58cc13269bac2bd2eed94e05da23f5ff7",
+    "engine/preparation.go": "86c38cb1ae0946d77eb50f0a49e3a6a223b25d3b9dd75705eae77813d57373cc",
+    "engine/preparation_test.go": "4bc49173ff774d623171672551ff8fc3735e13c59ffba308e6f750ace6c53651",
+    "engine/pressure_test.go": "42b756edb5e7806fd3fc2c0409b6594ac4317f3866c336de9ee9bfd530974a65",
+    "engine/ramet_test.go": "60d9e42ccc51e8b38d3af6c2a02bc8c8a2762a769e34d102ddc067ab80de83dc",
+    "engine/remote.go": "51c007130a3798e4b0bbc3c7a08c45e0d26d12f3680c75d8d9a25630635a5a51",
+    "engine/store.go": "437ef06ee746f5611fb873eac9f8c4e1eb48f1a15d7352bb915b4d089a6e446c",
+    "engine/types.go": "c1db619553cc2bc142b7c537f165adc0c1adb4b8f17da3ea44c40601bd1ce632",
+    "examples/python/parallel_eval.py": "c8d67dd4d150686356d950bcf3305319c813c71922925bfeb7c9f3d29fca4a55",
+    "go.mod": "588a78770196fbafb48319ad27dca1e16e940d5d9406023aeba16c54521b97a5",
+    "go.sum": "21dc6f7d4ab37713d49171ae09004e85d7c28e5da2bc6cf81c36c31a241e1a7f",
+    "integration/integration_test.go": "1e94e0e6be48c8a2a5d141898b1cfbd008317cd1308533f94892a2b8dc1be98d",
+    "integration/phase2_test.go": "ffba8209b9b5c4b9dd420c2b29237c55659970adbf21716d2f38efc9b7b60da2",
+    "internal/benchmark/benchmark.go": "e43c543896b0bbeca1e3104dc4aba276c799e2d7ef88c813ea374efca7385599",
+    "internal/config/config.go": "62d855525f437c9d3e7a981be1a7dc1cda623d7a2d5dadb22e2843e2ea6f2f77",
+    "internal/config/config_test.go": "fc6cd36e210c7d72ea3b668e1cd6ad72a11c76a72178f4a3ce2e814b4d6bf254",
+    "internal/fsutil/clone_darwin.go": "013a55b0d99b3ab1c51cf0eb5a1332a334e4c415a759805e92ee302115bdb9a7",
+    "internal/fsutil/clone_linux.go": "355c5d3fe6c35505620025b37c936043e9770df9f26a3e3f1c7594f648ac6b0f",
+    "internal/fsutil/fs.go": "549bfbb46ef6e7e9320f26ffa1e32340ae66678397ff0f0153cdfe0b08645586",
+    "internal/fsutil/fs_test.go": "087126068be1d99d0dbf89668c01e067684644fcbd4efbc6694b18edc24c58c9",
+    "internal/fsutil/lock.go": "db8f096706bfb15b56e2e5e3ad33689da9f22ebb6910e69cb55aeea9eb61ad0e",
+    "internal/lazyfs/linux.go": "613d3a3b3dbd397fdf13f7bfa498f995eebb9a94afb239f33c752a49491bd499",
+    "internal/lazyfs/linux_test.go": "c6f5a28a5843a2c8a527c020aa25089d0605fbedc4e9396c8f2ace13d2138331",
+    "internal/lazyfs/types.go": "04d68387dfa4c052170740f51e13107de6da9070563b6f598916d0aa47ae1b38",
+    "internal/lazyfs/unsupported.go": "465c1ae42001300231eb770eecfca709f668a2a56d0e817f0ccb656e22570f7f",
+    "scripts/phase1-fanout.py": "acaa45dd7f997ee617ef19296fe1b1c44d3b505149a4a30d133537c00b0e5767",
+    "scripts/phase2-soak.py": "df317155f56a29315f6533a6b30644ea13c4dfd041fa7156440f5d4eb6323742",
+    "sdk/python/ramet/__init__.py": "71c9f44e7022ab24b8086e9dce27bce5b78eafad2e6b7e9f7a9fe83687ec3b24",
+    "sdk/python/ramet/client.py": "a0c7fe2cd66935452c5aedec2b09e8d8835de26e6aba6a075cf4914f7ce39299",
+    "sdk/python/tests/test_integration.py": "fc164f749ad4b2b5b5eb6ce995c22fc8ab03d37c54fd05f525be4c848856b8a7",
+    "server/observability.go": "429bc9799c759b4e7f1201482c3a43e415872427ef9daed6c63ffb8cd145bee6",
+    "server/server.go": "885f92deea92134e732b605c682cd092f29be70bb3ead11934ced0334156ff56",
+    "server/server_test.go": "38c6d2a3d417a2ac8200e4f8ca0f7e1ba019d1c146bed31b1fdbf8e45f29dc5d",
+    "server/tenants.go": "7d4cc9b2aa12b14a5cc055887d1c5308aa99b64a31a470723747eec47045ca33",
+    "server/tenants_test.go": "0b2c814ea9dfce441c84af872554f6d2caed30cd42b3880d333440e59b00eebc",
+    "storage/postgres/postgres.go": "6513ee210454494b102c35abc06ca1c506ee8794702410f4a1cb785a00e12f7e",
+    "storage/s3/s3.go": "6291eb1724e04aac76eda81df1a4aaeccd010ad56cb1ef4082f1d446a74823a4",
+    "storage/storage.go": "66df38a9a44d3d323ce8e20f97b695200d6e198573126de87a46e5dc24215e83"
+  },
+  "binary_sha256": "77c116ecc3f25ebaa97b89b0bce2a02450daec8d267cc5e7daabb51aef7e2b7c",
+  "samples": [
+    {
+      "rss_kib": 25120,
+      "threads": 27,
+      "fds": 29,
+      "disk_kib": 14600,
+      "seconds": 0.02805871143937111,
+      "cycles": {
+        "copy": 0,
+        "lazy": 0
+      },
+      "cache": {
+        "copy": {
+          "bytes": 1048576,
+          "limit_bytes": 1048576,
+          "objects": 16,
+          "pinned_objects": 1,
+          "reserved_disk_bytes": 131083,
+          "free_disk_bytes": 452410400768,
+          "min_free_disk_bytes": 1073741824,
+          "idle_executions": 0,
+          "max_idle_executions": 8,
+          "hits": 1,
+          "misses": 322,
+          "evictions": 370,
+          "evicted_bytes": 24248320,
+          "pressure_failures": 0
+        },
+        "lazy": {
+          "bytes": 1048576,
+          "limit_bytes": 1048576,
+          "objects": 16,
+          "pinned_objects": 1,
+          "reserved_disk_bytes": 65536,
+          "free_disk_bytes": 452410400768,
+          "min_free_disk_bytes": 1073741824,
+          "idle_executions": 0,
+          "max_idle_executions": 8,
+          "hits": 0,
+          "misses": 69,
+          "evictions": 117,
+          "evicted_bytes": 7667712,
+          "pressure_failures": 0
+        }
+      }
+    },
+    {
+      "rss_kib": 34768,
+      "threads": 66,
+      "fds": 47,
+      "disk_kib": 39484,
+      "seconds": 20.01212191581726,
+      "cycles": {
+        "copy": 20,
+        "lazy": 248
+      },
+      "cache": {
+        "copy": {
+          "bytes": 1048576,
+          "limit_bytes": 1048576,
+          "objects": 16,
+          "pinned_objects": 1,
+          "reserved_disk_bytes": 65536,
+          "free_disk_bytes": 452370370560,
+          "min_free_disk_bytes": 1073741824,
+          "idle_executions": 0,
+          "max_idle_executions": 8,
+          "hits": 1475,
+          "misses": 1102,
+          "evictions": 1154,
+          "evicted_bytes": 74842244,
+          "pressure_failures": 1
+        },
+        "lazy": {
+          "bytes": 983088,
+          "limit_bytes": 1048576,
+          "objects": 19,
+          "pinned_objects": 1,
+          "reserved_disk_bytes": 65536,
+          "free_disk_bytes": 452370370560,
+          "min_free_disk_bytes": 1073741824,
+          "idle_executions": 0,
+          "max_idle_executions": 8,
+          "hits": 1810,
+          "misses": 691,
+          "evictions": 812,
+          "evicted_bytes": 51446072,
+          "pressure_failures": 1
+        }
+      }
+    },
+    {
+      "rss_kib": 34044,
+      "threads": 82,
+      "fds": 55,
+      "disk_kib": 35372,
+      "seconds": 38.14583631977439,
+      "cycles": {
+        "copy": 58,
+        "lazy": 496
+      },
+      "cache": {
+        "copy": {
+          "bytes": 1048576,
+          "limit_bytes": 1048576,
+          "objects": 16,
+          "pinned_objects": 1,
+          "reserved_disk_bytes": 65536,
+          "free_disk_bytes": 452372312064,
+          "min_free_disk_bytes": 1073741824,
+          "idle_executions": 0,
+          "max_idle_executions": 8,
+          "hits": 3667,
+          "misses": 1818,
+          "evictions": 1870,
+          "evicted_bytes": 121766020,
+          "pressure_failures": 2
+        },
+        "lazy": {
+          "bytes": 1048576,
+          "limit_bytes": 1048576,
+          "objects": 16,
+          "pinned_objects": 1,
+          "reserved_disk_bytes": 65536,
+          "free_disk_bytes": 452372312064,
+          "min_free_disk_bytes": 1073741824,
+          "idle_executions": 0,
+          "max_idle_executions": 8,
+          "hits": 3415,
+          "misses": 1316,
+          "evictions": 1446,
+          "evicted_bytes": 91554370,
+          "pressure_failures": 2
+        }
+      }
+    },
+    {
+      "rss_kib": 32316,
+      "threads": 84,
+      "fds": 50,
+      "disk_kib": 40828,
+      "seconds": 57.76848434843123,
+      "cycles": {
+        "copy": 100,
+        "lazy": 744
+      },
+      "cache": {
+        "copy": {
+          "bytes": 1048576,
+          "limit_bytes": 1048576,
+          "objects": 16,
+          "pinned_objects": 1,
+          "reserved_disk_bytes": 65536,
+          "free_disk_bytes": 452372926464,
+          "min_free_disk_bytes": 1073741824,
+          "idle_executions": 0,
+          "max_idle_executions": 8,
+          "hits": 5965,
+          "misses": 2648,
+          "evictions": 2700,
+          "evicted_bytes": 176160900,
+          "pressure_failures": 3
+        },
+        "lazy": {
+          "bytes": 983092,
+          "limit_bytes": 1048576,
+          "objects": 19,
+          "pinned_objects": 1,
+          "reserved_disk_bytes": 65536,
+          "free_disk_bytes": 452372926464,
+          "min_free_disk_bytes": 1073741824,
+          "idle_executions": 0,
+          "max_idle_executions": 8,
+          "hits": 5038,
+          "misses": 1947,
+          "evictions": 2084,
+          "evicted_bytes": 131990355,
+          "pressure_failures": 3
+        }
+      }
+    },
+    {
+      "rss_kib": 34944,
+      "threads": 84,
+      "fds": 49,
+      "disk_kib": 40620,
+      "seconds": 77.42925108131021,
+      "cycles": {
+        "copy": 127,
+        "lazy": 992
+      },
+      "cache": {
+        "copy": {
+          "bytes": 1048576,
+          "limit_bytes": 1048576,
+          "objects": 16,
+          "pinned_objects": 1,
+          "reserved_disk_bytes": 65536,
+          "free_disk_bytes": 452367261696,
+          "min_free_disk_bytes": 1073741824,
+          "idle_executions": 0,
+          "max_idle_executions": 8,
+          "hits": 7682,
+          "misses": 3487,
+          "evictions": 3543,
+          "evicted_bytes": 230621460,
+          "pressure_failures": 4
+        },
+        "lazy": {
+          "bytes": 1048576,
+          "limit_bytes": 1048576,
+          "objects": 16,
+          "pinned_objects": 1,
+          "reserved_disk_bytes": 65536,
+          "free_disk_bytes": 452367261696,
+          "min_free_disk_bytes": 1073741824,
+          "idle_executions": 0,
+          "max_idle_executions": 8,
+          "hits": 6889,
+          "misses": 2664,
+          "evictions": 2812,
+          "evicted_bytes": 178128011,
+          "pressure_failures": 4
+        }
+      }
+    },
+    {
+      "rss_kib": 35524,
+      "threads": 84,
+      "fds": 49,
+      "disk_kib": 39912,
+      "seconds": 95.38776919804513,
+      "cycles": {
+        "copy": 166,
+        "lazy": 1240
+      },
+      "cache": {
+        "copy": {
+          "bytes": 1048576,
+          "limit_bytes": 1048576,
+          "objects": 16,
+          "pinned_objects": 1,
+          "reserved_disk_bytes": 65536,
+          "free_disk_bytes": 452372516864,
+          "min_free_disk_bytes": 1073741824,
+          "idle_executions": 0,
+          "max_idle_executions": 8,
+          "hits": 9841,
+          "misses": 4196,
+          "evictions": 4252,
+          "evicted_bytes": 277086484,
+          "pressure_failures": 5
+        },
+        "lazy": {
+          "bytes": 1048576,
+          "limit_bytes": 1048576,
+          "objects": 16,
+          "pinned_objects": 1,
+          "reserved_disk_bytes": 65536,
+          "free_disk_bytes": 452372385792,
+          "min_free_disk_bytes": 1073741824,
+          "idle_executions": 0,
+          "max_idle_executions": 8,
+          "hits": 8579,
+          "misses": 3318,
+          "evictions": 3474,
+          "evicted_bytes": 220202383,
+          "pressure_failures": 5
+        }
+      }
+    },
+    {
+      "rss_kib": 39008,
+      "threads": 92,
+      "fds": 52,
+      "disk_kib": 35116,
+      "seconds": 113.55065215472132,
+      "cycles": {
+        "copy": 203,
+        "lazy": 1496
+      },
+      "cache": {
+        "copy": {
+          "bytes": 1048576,
+          "limit_bytes": 1048576,
+          "objects": 16,
+          "pinned_objects": 1,
+          "reserved_disk_bytes": 65536,
+          "free_disk_bytes": 452393947136,
+          "min_free_disk_bytes": 1073741824,
+          "idle_executions": 0,
+          "max_idle_executions": 8,
+          "hits": 12050,
+          "misses": 4919,
+          "evictions": 4975,
+          "evicted_bytes": 324469012,
+          "pressure_failures": 6
+        },
+        "lazy": {
+          "bytes": 1048576,
+          "limit_bytes": 1048576,
+          "objects": 16,
+          "pinned_objects": 1,
+          "reserved_disk_bytes": 65536,
+          "free_disk_bytes": 452393947136,
+          "min_free_disk_bytes": 1073741824,
+          "idle_executions": 0,
+          "max_idle_executions": 8,
+          "hits": 10276,
+          "misses": 3969,
+          "evictions": 4133,
+          "evicted_bytes": 261818055,
+          "pressure_failures": 5
+        }
+      }
+    },
+    {
+      "rss_kib": 28496,
+      "threads": 92,
+      "fds": 31,
+      "disk_kib": 6172,
+      "seconds": 123.07036806084216,
+      "cycles": {
+        "copy": 223,
+        "lazy": 1616
+      }
+    }
+  ],
+  "errors": [],
+  "runtime_isolation": "passed: network none, cpu 0.5, memory 64MiB, pids 32, readonly root, no capabilities, no-new-privileges",
+  "preparation": {
+    "copy": {
+      "cold_acquire_seconds": 1.6547618079930544,
+      "warm_acquire_seconds": 0.0061745112761855125
+    },
+    "lazy": {
+      "cold_acquire_seconds": 0.01513609103858471,
+      "warm_acquire_seconds": 0.0020021945238113403
+    }
+  },
+  "elapsed_seconds": 122.724554579705,
+  "cycles": {
+    "copy": 223,
+    "lazy": 1616
+  },
+  "cycle_latency_seconds": {
+    "copy": {
+      "p50": 1.632866634055972,
+      "p95": 3.2946392511948943,
+      "p99": 11.837863738648593
+    },
+    "lazy": {
+      "p50": 0.03209190536290407,
+      "p95": 1.714311644434929,
+      "p99": 5.118365722708404
+    }
+  },
+  "final_cache": {
+    "copy": {
+      "bytes": 1048576,
+      "limit_bytes": 1048576,
+      "objects": 16,
+      "pinned_objects": 0,
+      "reserved_disk_bytes": 0,
+      "free_disk_bytes": 452408639488,
+      "min_free_disk_bytes": 1073741824,
+      "idle_executions": 0,
+      "max_idle_executions": 8,
+      "hits": 12956,
+      "misses": 5348,
+      "evictions": 5404,
+      "evicted_bytes": 352583956,
+      "pressure_failures": 7
+    },
+    "lazy": {
+      "bytes": 983092,
+      "limit_bytes": 1048576,
+      "objects": 19,
+      "pinned_objects": 0,
+      "reserved_disk_bytes": 0,
+      "free_disk_bytes": 452407300096,
+      "min_free_disk_bytes": 1073741824,
+      "idle_executions": 0,
+      "max_idle_executions": 8,
+      "hits": 11061,
+      "misses": 4263,
+      "evictions": 4428,
+      "evicted_bytes": 280626991,
+      "pressure_failures": 5
+    }
+  },
+  "worker_exit_code": 0
+}

@@ -1,0 +1,9 @@
+{
+  "recorded_at": "2026-10-08T19:49:09.648391+00:00",
+  "command": "./bin/ramet demo --concurrency 16 --iterations 1000 --require-cow",
+  "source_sha256": "4bb21b727db38f15c86edf55654132b7f52f1abbd78b5ba933512656070b4c9e",
+  "source_digest_method": "sorted Go source paths and go.mod/go.sum, each encoded as path NUL contents NUL",
+  "kernel": "25.4.0",
+  "fixture": "32 generated files, 2621440 logical bytes; marker write then verified recycle",
+  "notes": "Local development machine; background system activity uncontrolled. CPU model and physical shared-extent usage not measured. Counters captured before pool teardown."
+}

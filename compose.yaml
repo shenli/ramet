@@ -1,0 +1,18 @@
+services:
+  ramet:
+    build: .
+    ports:
+      - "127.0.0.1:7433:7433"
+    environment:
+      RAMET_TOKEN: ${RAMET_TOKEN:?Set RAMET_TOKEN to a random development token}
+    volumes:
+      - ramet-data:/data
+    restart: unless-stopped
+    stop_grace_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+volumes:
+  ramet-data:

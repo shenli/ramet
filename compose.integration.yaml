@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ramet_test
+      POSTGRES_PASSWORD: ramet-local-integration-only
+      POSTGRES_DB: ramet_phase1_test
+    ports:
+      - "127.0.0.1:17432:5432"
+    volumes:
+      - ./.test-services/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ramet_test -d ramet_phase1_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  minio:
+    build:
+      context: ./deploy/minio
+      target: server
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: ramet_test
+      MINIO_ROOT_PASSWORD: ramet-local-integration-only
+    ports:
+      - "127.0.0.1:17900:9000"
+    volumes:
+      - ./.test-services/minio:/data

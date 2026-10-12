@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/shenli/ramet/main/schemas/policy-v1.schema.json",
+  "title": "Ramet persistence policy v1",
+  "description": "Policies apply on promotion. Initial snapshots/checkpoints retain supported files. Unclassified paths are durable. Runtime path, duplicate-rule, and retained-input checks still apply.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "rules": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/rule"}
+    }
+  },
+  "$defs": {
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)(?!.*[\\\\\\u0000])(?!.*\\/$).+$"
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "class"],
+      "properties": {
+        "path": {"allOf": [{"$ref": "#/$defs/path"}, {"not": {"pattern": "^\\.git(?:/|$)"}}]},
+        "class": {"enum": ["shared_immutable", "durable", "rebuildable", "ephemeral"]},
+        "recipe": {"type": "string"},
+        "runtime": {"type": "string"},
+        "inputs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/path"}}
+      },
+      "allOf": [{
+        "if": {"properties": {"class": {"const": "rebuildable"}}},
+        "then": {"required": ["recipe"], "properties": {"recipe": {"pattern": "\\S"}}},
+        "else": {"properties": {"inputs": {"maxItems": 0}, "runtime": {"const": ""}}}
+      }]
+    }
+  }
+}

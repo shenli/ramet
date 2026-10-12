@@ -1,0 +1,45 @@
+{
+  "os": "darwin",
+  "arch": "arm64",
+  "go_version": "go1.26.2",
+  "concurrency": 16,
+  "iterations": 1000,
+  "successful": 1000,
+  "seconds": 5.704456208,
+  "executions_per_second": 175.30154734075924,
+  "snapshot_seconds": 0.2398945,
+  "cold_ready": {
+    "p50_ms": 10.885583,
+    "p95_ms": 15.728125,
+    "p99_ms": 15.728125
+  },
+  "warm_ready": {
+    "p50_ms": 12.005083,
+    "p95_ms": 25.745208,
+    "p99_ms": 32.465792
+  },
+  "recycle": {
+    "p50_ms": 76.761125,
+    "p95_ms": 98.999583,
+    "p99_ms": 109.83475
+  },
+  "base_logical_bytes": 2621440,
+  "snapshot": "1f4aa268e7b8b6f32cc5c94552b57a54dae91173015477aeb98f111c2aedf59f",
+  "copy_on_write": true,
+  "durable_bytes_during_executions": 0,
+  "heap_bytes_after": 1997512,
+  "stats": {
+    "acquires": 1016,
+    "resets": 1016,
+    "recycles": 1016,
+    "verifications": 2032,
+    "verification_failures": 0,
+    "quarantines": 0,
+    "cloned_files": 33024,
+    "copied_files": 0,
+    "content_bytes_written": 2621440,
+    "active_executions": 0,
+    "idle_executions": 16,
+    "pools": 1
+  }
+}

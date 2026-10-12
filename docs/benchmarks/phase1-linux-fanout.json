@@ -1,0 +1,60 @@
+{
+  "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.35",
+  "fixture_commit": "8bf469d76c0b0d2f3d63f55ae85bdd74eefaa61e",
+  "fixture_logical_bytes": 262529,
+  "fixture_files": 33,
+  "rounds": [
+    {
+      "round": 1,
+      "concurrent_slots": 1000,
+      "ready_seconds": 0.7512650964781642,
+      "seconds": 1.8129184041172266,
+      "executions_per_second": 551.5968053106808,
+      "attempt_recycle_p95_seconds": 0.05716555193066597
+    },
+    {
+      "round": 2,
+      "concurrent_slots": 1000,
+      "ready_seconds": 0.12230575550347567,
+      "seconds": 1.1791424406692386,
+      "executions_per_second": 848.0739607951319,
+      "attempt_recycle_p95_seconds": 0.05523063801229
+    },
+    {
+      "round": 3,
+      "concurrent_slots": 1000,
+      "ready_seconds": 0.13523191679269075,
+      "seconds": 0.9842489641159773,
+      "executions_per_second": 1016.0031013069644,
+      "attempt_recycle_p95_seconds": 0.044874452985823154
+    }
+  ],
+  "successful": 3000,
+  "parallelism": 32,
+  "metrics_delta": {
+    "ramet_acquires_total": 3000.0,
+    "ramet_resets_total": 3000.0,
+    "ramet_recycles_total": 3000.0,
+    "ramet_verifications_total": 9000.0,
+    "ramet_verification_failures_total": 0.0,
+    "ramet_quarantines_total": 0.0,
+    "ramet_cloned_files_total": 0.0,
+    "ramet_copied_files_total": 76000.0,
+    "ramet_content_bytes_written_total": 0.0,
+    "ramet_remote_bytes_uploaded_total": 0.0,
+    "ramet_remote_bytes_downloaded_total": 0.0,
+    "ramet_expired_leases_total": 0.0,
+    "ramet_active_executions": 0.0,
+    "ramet_idle_executions": 0.0,
+    "ramet_pools": 0.0
+  },
+  "doctor": {
+    "ok": true,
+    "format": 1,
+    "copy_on_write": false,
+    "snapshots": 1,
+    "objects": 17,
+    "problems": [],
+    "durability": "remote"
+  }
+}

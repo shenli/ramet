@@ -1,0 +1,19 @@
+server:
+  listen: "0.0.0.0:7433"
+  token_env: RAMET_TOKEN
+worker:
+  data: /data/cache
+  max_executions: 4096
+  max_pools: 128
+metadata:
+  provider: postgres
+  dsn_env: RAMET_DATABASE_URL
+  namespace: default
+content:
+  provider: s3
+  endpoint: http://minio:9000
+  region: us-east-1
+  bucket: ramet
+  prefix: default/objects
+  access_key_env: RAMET_S3_ACCESS_KEY
+  secret_key_env: RAMET_S3_SECRET_KEY

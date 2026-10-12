@@ -1,0 +1,19 @@
+name: Bug report
+description: Report a reproducible problem; report vulnerabilities privately.
+body:
+  - type: textarea
+    attributes:
+      label: Environment
+      description: Ramet version, OS, filesystem, backend, and runtime. Redact credentials and private paths.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reproduction
+      description: Minimal steps or code, expected result, and actual result.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Evidence
+      description: Sanitized errors or logs. Do not include tokens, lease credentials, or private source.

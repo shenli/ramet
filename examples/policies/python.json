@@ -1,0 +1,8 @@
+{
+  "rules": [
+    {"path": ".venv", "class": "rebuildable", "recipe": "Create a virtualenv and install requirements.lock with pip --require-hashes", "inputs": ["requirements.lock"]},
+    {"path": "__pycache__", "class": "ephemeral"},
+    {"path": "scratch", "class": "ephemeral"},
+    {"path": "scratch/reports", "class": "durable"}
+  ]
+}

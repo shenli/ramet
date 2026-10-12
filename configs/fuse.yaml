@@ -1,0 +1,6 @@
+# Native Linux worker. Run as the Unix user that will access its workspaces.
+server:
+  listen: 127.0.0.1:7433
+worker:
+  backend: lazy
+  data: /tmp/ramet-fuse

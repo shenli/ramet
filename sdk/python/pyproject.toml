@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ramet-sdk"
+version = "0.3.0a1"
+description = "Verified workspace state for parallel AI agent executions"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+authors = [{name = "Ramet contributors"}]
+dependencies = []
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Topic :: System :: Distributed Computing",
+]
+
+[project.urls]
+Homepage = "https://github.com/shenli/ramet"
+Issues = "https://github.com/shenli/ramet/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ramet*"]
+
+[tool.setuptools.package-data]
+ramet = ["py.typed"]

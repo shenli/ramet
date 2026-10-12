@@ -1,0 +1,7 @@
+{
+  "rules": [
+    {"path": "node_modules", "class": "rebuildable", "recipe": "npm ci", "inputs": ["package.json", "package-lock.json"]},
+    {"path": "scratch", "class": "ephemeral"},
+    {"path": "scratch/reports", "class": "durable"}
+  ]
+}
