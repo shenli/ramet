@@ -51,6 +51,13 @@ type Content interface {
 	Identity() string
 }
 
+// ContentChecker optionally confirms an existing object's size and integrity
+// without a local copy. Implementations must not trust user-supplied metadata
+// as proof of content integrity. ErrNotFound means no durable object exists.
+type ContentChecker interface {
+	Check(context.Context, Ref) error
+}
+
 func ValidDigest(s string) bool {
 	if len(s) != 64 {
 		return false

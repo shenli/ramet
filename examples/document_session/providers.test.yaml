@@ -1,0 +1,16 @@
+# Disposable services from compose.integration.yaml; create the bucket first.
+# SPDX-License-Identifier: Apache-2.0
+worker:
+  backend: copy
+metadata:
+  provider: postgres
+  dsn_env: RAMET_DATABASE_URL
+  namespace: document-session-test
+content:
+  provider: s3
+  endpoint: http://127.0.0.1:17900
+  region: us-east-1
+  bucket: ramet-phase1-integration
+  prefix: document-session-test/objects
+  access_key_env: RAMET_S3_ACCESS_KEY
+  secret_key_env: RAMET_S3_SECRET_KEY

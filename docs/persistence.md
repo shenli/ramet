@@ -139,6 +139,8 @@ check, not a persisted readiness flag. Custom runtime cleanup must follow the
 
 ## Examples
 
+- [Pinned image and reusable dependencies](session-recovery.md): retain dependency
+  bytes as durable state, check runtime/input compatibility, and rebuild on mismatch.
 - [Selective save and restore](../examples/persistence/README.md): executable
   walkthrough, Docker option, readiness check, and input-drift rejection.
 - [Python policy](../examples/policies/python.json): opt-in `.venv` reconstruction

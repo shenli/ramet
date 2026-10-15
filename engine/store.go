@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -26,6 +27,9 @@ type Options struct {
 	// RequireCOW fails materialization if the filesystem cannot clone files.
 	Logger     *slog.Logger
 	RequireCOW bool
+	// DisableChunking keeps whole-file objects to favor simpler reconstruction.
+	// By default files of at least 8 MiB use content-defined chunks.
+	DisableChunking bool
 	// Backend selects copy (default) or Linux lazy hydration.
 	Backend         string
 	RestrictSources bool
@@ -629,6 +633,13 @@ func (s *Store) Doctor(ctx context.Context) (DoctorReport, error) {
 			r.Objects++
 			if err := s.verifyDurableObject(ctx, e); err != nil {
 				r.Problems = append(r.Problems, err.Error())
+			}
+		}
+		for _, e := range snap.Manifest.Entries {
+			if len(e.Chunks) > 0 {
+				if err := s.writeFile(ctx, e, io.Discard); err != nil {
+					r.Problems = append(r.Problems, err.Error())
+				}
 			}
 		}
 	}

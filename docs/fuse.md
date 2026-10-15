@@ -60,6 +60,12 @@ resource limits. See the [integration guide](integration.md).
 | Local fork | Produce an eager private copy of the current workspace. |
 | Reset | Unmount the old tree and prepare a new mount from the base. |
 
+Large files can be stored as [content-defined chunks](artifact-checkpoints.md).
+First open assembles and verifies the **entire file** into its private inode;
+this is file-level lazy hydration, not range fetching. Cache eviction pins one
+chunk at a time, so the remote cache need not hold the entire file. Promotion
+and checkpoint still read retained files in full to determine their chunks.
+
 A failed hydration returns an I/O error; a later open can retry after storage
 recovers. Worker startup recovers abandoned Ramet mounts after a crash. Neither
 uncommitted writes nor running processes survive worker failure. macOS and

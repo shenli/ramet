@@ -44,7 +44,11 @@ func (s *Store) putFile(ctx context.Context, name string) (string, int64, error)
 	if err != nil {
 		return "", 0, err
 	}
-	release, err := s.reserveDisk(info.Size())
+	return s.putObject(ctx, in, info.Size())
+}
+
+func (s *Store) putObject(ctx context.Context, in io.Reader, size int64) (string, int64, error) {
+	release, err := s.reserveDisk(size)
 	if err != nil {
 		return "", 0, err
 	}
@@ -68,7 +72,7 @@ func (s *Store) putFile(ctx context.Context, name string) (string, int64, error)
 	}
 	digest := hex.EncodeToString(h.Sum(nil))
 	dest := filepath.Join(s.root, "objects", digest)
-	if s.opts.Content != nil {
+	if s.opts.Content != nil && !confirmedContent(ctx, digest, n) {
 		f, openErr := os.Open(tmp.Name())
 		if openErr != nil {
 			return "", 0, openErr
@@ -81,6 +85,7 @@ func (s *Store) putFile(ctx context.Context, name string) (string, int64, error)
 		if added {
 			s.metrics.uploaded.Add(uint64(n))
 		}
+		confirmContent(ctx, digest, n)
 	}
 	err = s.installCache(ctx, tmp.Name(), Entry{Kind: "file", Digest: digest, Size: n})
 	if err == nil {
@@ -101,6 +106,7 @@ func (s *Store) verifyObject(ctx context.Context, e Entry) error {
 }
 
 func (s *Store) capture(ctx context.Context, source string, manifest Manifest, selective bool, base *Manifest) (Snapshot, error) {
+	ctx = context.WithValue(ctx, captureContentKey{}, map[string]int64{})
 	info, err := os.Stat(source)
 	if err != nil {
 		return Snapshot{}, err
@@ -176,7 +182,7 @@ func (s *Store) capture(ctx context.Context, source string, manifest Manifest, s
 			e.Kind = "dir"
 		case info.Mode().IsRegular():
 			e.Kind = "file"
-			e.Digest, e.Size, err = s.putFile(ctx, name)
+			e.Digest, e.Size, e.Chunks, err = s.captureFile(ctx, name, info.Size())
 			if err != nil {
 				return err
 			}
@@ -271,7 +277,7 @@ func safeTarget(name, target string) bool {
 }
 
 func validateManifest(m Manifest) error {
-	if m.Version != 1 && m.Version != 2 && m.Version != FormatVersion {
+	if m.Version < 1 || m.Version > FormatVersion {
 		return fmt.Errorf("unsupported manifest version %d", m.Version)
 	}
 	if err := m.Policy.Validate(); err != nil {
@@ -290,6 +296,9 @@ func validateManifest(m Manifest) error {
 			return fmt.Errorf("%w: invalid manifest entry %q", ErrInvalid, e.Path)
 		}
 		last = e.Path
+		if err := validateChunks(m.Version, e); err != nil {
+			return err
+		}
 		if dir := path.Dir(e.Path); dir != "." && seen[dir] != "dir" {
 			return fmt.Errorf("%w: missing/non-directory parent of %s", ErrInvalid, e.Path)
 		}
@@ -455,7 +464,7 @@ func (s *Store) materializeFrom(ctx context.Context, snap Snapshot, source func(
 				return copyErr
 			}
 			if source(e) == filepath.Join(s.root, "objects", e.Digest) {
-				err = s.withObject(ctx, e, copySource)
+				err = s.withFile(ctx, e, copySource)
 			} else {
 				err = copySource(source(e))
 			}
@@ -505,7 +514,11 @@ func (s *Store) materializeFrom(ctx context.Context, snap Snapshot, source func(
 	return dir, nil
 }
 
-func sameEntry(a, b Entry) bool { return a == b }
+// Storage representation is not part of filesystem identity.
+func sameEntry(a, b Entry) bool {
+	return a.Path == b.Path && a.Kind == b.Kind && a.Mode == b.Mode &&
+		a.Size == b.Size && a.ModTime == b.ModTime && a.Digest == b.Digest && a.Target == b.Target
+}
 
 func (s *Store) verifyTree(ctx context.Context, dir string, m Manifest) (Verification, error) {
 	return s.verifyTreeMode(ctx, dir, m, true)

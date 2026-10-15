@@ -33,6 +33,7 @@ type Config struct {
 		GitRepositories   []string      `yaml:"git_repositories"`
 		Data              string        `yaml:"data"`
 		RequireCOW        bool          `yaml:"require_cow"`
+		DisableChunking   bool          `yaml:"disable_chunking"`
 		MaxExecutions     int           `yaml:"max_executions"`
 		MaxPools          int           `yaml:"max_pools"`
 	} `yaml:"worker"`
@@ -83,6 +84,7 @@ func Load(name string) (Config, error) {
 
 func (c Config) Options(ctx context.Context) (engine.Options, error) {
 	opts := engine.Options{Backend: c.Worker.Backend, CacheBytes: c.Worker.CacheBytes, MinFreeDiskBytes: c.Worker.MinFreeDiskBytes, MaxIdleExecutions: c.Worker.MaxIdleExecutions, IdleTTL: c.Worker.IdleTTL, RestrictSources: c.Worker.RestrictSources, SourceRoots: c.Worker.SourceRoots, GitRepositories: c.Worker.GitRepositories, RequireCOW: c.Worker.RequireCOW, MaxExecutions: c.Worker.MaxExecutions, MaxPools: c.Worker.MaxPools}
+	opts.DisableChunking = c.Worker.DisableChunking
 	if c.Metadata.Provider != "postgres" {
 		return opts, nil
 	}

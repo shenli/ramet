@@ -16,6 +16,8 @@ work, your sandbox runs it, and Ramet manages the workspace lifecycle.
 | Problem you need to solve | What Ramet handles |
 | --- | --- |
 | **Keep agent files when a sandbox is replaced** | Save and restore workspace files and local Git state across sessions. |
+| **Resume document-generation tasks** | Checkpoint PDFs, documents, spreadsheets, and presentations; reuse unchanged chunks of large files. [Artifact checkpoints](docs/artifact-checkpoints.md). |
+| **Continue work without reinstalling compatible dependencies** | Restore a workspace with a pinned runtime image and check dependencies before reuse. [Session recovery](docs/session-recovery.md). |
 | **Give parallel agents isolated workspaces** | Independent attempts from one base, local forks, and selective persistence for best-of-N coding agents. |
 | **Reset RL environments between rollouts** | Clean filesystem resets and verification before workspace reuse to catch contamination. |
 | **Run repeatable agent evaluations** | Reuse prepared repositories and dependencies through shared content, caches, and warm pools. |
@@ -166,6 +168,8 @@ For ready-made demonstrations, run `./bin/ramet demo` or follow the
 - [Agent integration guide](docs/agents.md) — discover capabilities, validate policies, and recover interrupted calls.
 
 - [Persistence policies](docs/persistence.md) · [Selective save and restore](examples/persistence/README.md) — inspect and reconstruct saved work.
+- [Artifact checkpoints](docs/artifact-checkpoints.md) — save large document revisions and restore work after sandbox replacement.
+- [Session recovery](docs/session-recovery.md) — pair a pinned image with persistent files and compatible dependencies; [runnable DOCX example](examples/document_session/README.md).
 - [Integration guide](docs/integration.md) · [Google AX assessment](docs/ax-integration.md) — scope your runtime integration.
 - [Coding demo](examples/best_of_n/README.md) — run the workflow and integrate your agent.
 - [Python SDK](sdk/python/README.md) · [Go integration](docs/go.md) — use Ramet from your harness.

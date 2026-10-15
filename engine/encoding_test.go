@@ -7,6 +7,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -74,7 +75,7 @@ func FuzzSymlinkTargetRoundTrip(f *testing.F) {
 		if err = json.Unmarshal(data, &restored); err != nil {
 			t.Fatal(err)
 		}
-		if len(restored.Entries) != 1 || restored.Entries[0] != original {
+		if len(restored.Entries) != 1 || !reflect.DeepEqual(restored.Entries[0], original) {
 			t.Fatalf("target changed during serialization: %q", target)
 		}
 	})

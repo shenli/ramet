@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"sync"
 	"testing"
@@ -679,7 +680,7 @@ func FuzzManifestPaths(f *testing.F) {
 			if err := json.Unmarshal(data, &restored); err != nil {
 				t.Fatal(err)
 			}
-			if len(restored.Entries) != 1 || restored.Entries[0] != e {
+			if len(restored.Entries) != 1 || !reflect.DeepEqual(restored.Entries[0], e) {
 				t.Fatalf("accepted entry changed during JSON round trip: %q", name)
 			}
 		}

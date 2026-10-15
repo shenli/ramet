@@ -74,7 +74,13 @@ func (s *Store) contentRefs(m Manifest) []Entry {
 	out := make([]Entry, 0, len(m.Entries)+3)
 	for _, e := range m.Entries {
 		if e.Kind == "file" {
-			out = append(out, e)
+			if len(e.Chunks) == 0 {
+				out = append(out, e)
+			} else {
+				for _, c := range e.Chunks {
+					out = append(out, refEntry(c))
+				}
+			}
 		}
 	}
 	if g := m.GitObjects; g != nil {

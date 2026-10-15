@@ -70,9 +70,13 @@ func (s *Store) materializeLazy(ctx context.Context, snap Snapshot) (string, err
 			err = os.Symlink(e.Target, dest)
 		case "file":
 			if strings.HasPrefix(e.Path, ".git/") {
-				err = s.withObject(ctx, e, func(source string) error {
-					if err := s.verifyObject(ctx, e); err != nil {
+				err = s.withFile(ctx, e, func(source string) error {
+					digest, size, err := digestFile(ctx, source)
+					if err != nil {
 						return err
+					}
+					if digest != e.Digest || size != e.Size {
+						return ErrVerification
 					}
 					release, err := s.reserveDisk(e.Size)
 					if err != nil {
@@ -132,32 +136,22 @@ func (s *Store) materializeLazy(ctx context.Context, snap Snapshot) (string, err
 			}
 		}()
 		e := entries[file.Path]
-		return s.withObject(ctx, e, func(source string) error {
-			if err := s.verifyObject(ctx, e); err != nil {
-				return err
-			}
-			release, err := s.reserveDisk(e.Size)
-			if err != nil {
-				return err
-			}
-			defer release()
-			in, err := os.Open(source)
-			if err != nil {
-				return err
-			}
-			defer in.Close()
-			if err = dest.Truncate(e.Size); err != nil {
-				return err
-			}
-			if _, err = dest.Seek(0, 0); err != nil {
-				return err
-			}
-			_, err = fsutil.Copy(ctx, dest, in)
-			if err == nil {
-				s.metrics.copied.Add(1)
-			}
+		release, err := s.reserveDisk(e.Size)
+		if err != nil {
 			return err
-		})
+		}
+		defer release()
+		if err = dest.Truncate(e.Size); err != nil {
+			return err
+		}
+		if _, err = dest.Seek(0, 0); err != nil {
+			return err
+		}
+		err = s.writeFile(ctx, e, dest)
+		if err == nil {
+			s.metrics.copied.Add(1)
+		}
+		return err
 	})
 	if err != nil {
 		return "", err

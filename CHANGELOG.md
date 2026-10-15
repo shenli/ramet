@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Python dependency compatibility checks keyed by pinned image, platform,
+  workspace path, and input hashes, with verified reuse or caller-owned rebuild;
+  executable DOCX session recovery and a pinned-environment integration guide.
+- Content-defined chunks for files of at least 8 MiB, complete snapshot chunk
+  lists, and verified reconstruction through copy/reflink and Linux FUSE.
+- Native S3 SHA-256 verification avoids downloading unchanged objects during
+  capture; objects without a full-object checksum retain read verification.
+- Document-revision benchmark, interrupted-upload and cold-worker recovery
+  tests, and an artifact checkpoint guide with measured tradeoffs.
 - Bounded Docker command output with cleanup before workspace reuse on overflow.
 - SkyRL-Gym environment example and integration guide; framework integration
   paths and updated workspace architecture overview.

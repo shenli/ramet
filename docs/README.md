@@ -7,6 +7,8 @@ contains future capabilities. Start with the guide that matches your task.
 | Task | Guide |
 | --- | --- |
 | Integrate an agent harness with verifiable recovery | [Agent integration guide](agents.md) |
+| Checkpoint large PDFs, documents, spreadsheets, and presentations | [Artifact checkpoints](artifact-checkpoints.md) |
+| Resume a task with a pinned image and reusable dependencies | [Session recovery](session-recovery.md), [DOCX example](../examples/document_session/README.md) |
 | Give SkyRL rollouts isolated workspaces | [SkyRL integration and runnable environment](skyrl-integration.md) |
 | Preview saved state and reconstruct omitted files | [Persistence policies](persistence.md), [runnable example](../examples/persistence/README.md) |
 | Assess integration with Google AX | [AX assessment](ax-integration.md) |

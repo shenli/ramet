@@ -13,7 +13,8 @@ import threading
 import time
 import unittest
 
-from ramet import DockerRuntime, Ramet, RametEnv, RametError, OutcomeUnknownError, RebuildError
+from ramet import (DependencyEnvironment, DockerRuntime, Ramet, RametEnv, RametError,
+                   OutcomeUnknownError, RebuildError, prepare_dependencies)
 
 
 class IntegrationTests(unittest.TestCase):
@@ -187,6 +188,34 @@ class IntegrationTests(unittest.TestCase):
                     self.assertEqual((execution.path / "base.txt").read_text(), "base")
             with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
                 list(executor.map(attempt, range(24)))
+
+    def test_dependency_reuse_after_restore_and_policy_exclusion(self):
+        environment = DependencyEnvironment("sha256:" + "a" * 64, "linux/amd64")
+        builds = []
+        def build(execution):
+            builds.append(execution.id)
+            (execution.path / "deps").mkdir(exist_ok=True)
+            (execution.path / "deps/package").write_text("installed")
+        def prepare(execution):
+            return prepare_dependencies(execution, environment, directory="deps", inputs=["base.txt"],
+                rebuild=build, verify=lambda e: (e.path / "deps/package").read_text() == "installed")
+        for dependency_class in ("durable", "ephemeral"):
+            with self.subTest(policy=dependency_class):
+                base = self.client.snapshot(self.source, policy={"rules": [
+                    {"path": "deps", "class": dependency_class}]})
+                with self.client.execution_pool(base, concurrency=1) as pool:
+                    with pool.acquire() as execution:
+                        self.assertFalse(prepare(execution)["reused"])
+                        (execution.path / "report.docx").write_bytes(b"retained artifact")
+                        saved = execution.promote()
+                before = len(builds)
+                with self.client.execution_pool(saved, concurrency=1) as pool:
+                    with pool.acquire() as execution:
+                        self.assertEqual(prepare(execution)["reused"], dependency_class == "durable")
+                        self.assertEqual(len(builds) - before, int(dependency_class != "durable"))
+                        (execution.path / "base.txt").write_text("changed dependency inputs")
+                        self.assertFalse(prepare(execution)["reused"])
+                        self.assertEqual((execution.path / "report.docx").read_bytes(), b"retained artifact")
 
     def test_promote_resume_and_fork(self):
         with self.client.execution_pool(self.base, concurrency=2) as pool:

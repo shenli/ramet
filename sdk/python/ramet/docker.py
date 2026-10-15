@@ -5,6 +5,7 @@ SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
 import math
+import json
 import os
 import selectors
 import subprocess
@@ -14,6 +15,16 @@ from datetime import datetime, timezone
 from typing import Sequence
 
 from .client import Execution, _lease_expiry
+from .environment import DependencyEnvironment
+
+
+def _require_local_daemon() -> None:
+    context = subprocess.run(["docker", "context", "inspect", "--format",
+                              "{{.Endpoints.docker.Host}}"], capture_output=True,
+                             text=True, check=True, timeout=15).stdout.strip()
+    endpoint = context if os.getenv("DOCKER_CONTEXT") else (os.getenv("DOCKER_HOST") or context)
+    if not endpoint.startswith("unix://"):
+        raise RuntimeError("DockerRuntime requires a local Unix-socket Docker daemon")
 
 
 class DockerRuntime:
@@ -36,6 +47,23 @@ class DockerRuntime:
         self.image, self.cpus, self.memory_mb, self.pids = image, cpus, memory_mb, pids
         self.max_output_bytes = max_output_bytes
 
+    def dependency_environment(self) -> DependencyEnvironment:
+        """Inspect the pre-pulled, digest-pinned image used by this adapter.
+
+        Tags are rejected. The returned platform comes from the local Docker
+        daemon's image, not the Python client's host architecture. Containers
+        launched by this adapter always mount at /workspace.
+        """
+        DependencyEnvironment(self.image, "linux/unknown")  # Validate the pin before inspecting.
+        _require_local_daemon()
+        result = subprocess.run(["docker", "image", "inspect", self.image],
+                                capture_output=True, text=True, check=True, timeout=15)
+        info = json.loads(result.stdout)[0]
+        platform = info["Os"] + "/" + info["Architecture"]
+        if info.get("Variant"):
+            platform += "/" + info["Variant"]
+        return DependencyEnvironment(self.image, platform)
+
     def run(self, execution: Execution, args: Sequence[str], *, timeout: float = 60,
             check: bool = False) -> subprocess.CompletedProcess[str]:
         if isinstance(args, (str, bytes)) or not args:
@@ -53,12 +81,7 @@ class DockerRuntime:
             if "," in str(path) or "\n" in str(path):
                 raise ValueError("workspace path cannot contain commas or newlines")
             # A remote daemon would interpret worker paths on the wrong host.
-            context = subprocess.run(["docker", "context", "inspect", "--format",
-                                      "{{.Endpoints.docker.Host}}"], capture_output=True,
-                                     text=True, check=True, timeout=15).stdout.strip()
-            endpoint = context if os.getenv("DOCKER_CONTEXT") else (os.getenv("DOCKER_HOST") or context)
-            if not endpoint.startswith("unix://"):
-                raise RuntimeError("DockerRuntime requires a local Unix-socket Docker daemon")
+            _require_local_daemon()
             name = "ramet-run-" + uuid.uuid4().hex
 
             def cleanup() -> None:

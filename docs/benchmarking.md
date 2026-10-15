@@ -1,5 +1,9 @@
 # Benchmarks and soak workloads
 
+For large PDF, DOCX, XLSX, and PPTX revisions, see the
+[artifact checkpoint benchmark](artifact-checkpoints.md#reproduce-the-document-comparison)
+and its [measured storage/restore tradeoffs](testing/2026-10-15-artifact-checkpoints.md).
+
 A checked-in [local result](benchmarks/macos-arm64-local.json) and its
 [command/source metadata](benchmarks/macos-arm64-local.metadata.json) record
 1,000 successful cycles at concurrency 16 on macOS arm64. All file

@@ -1,0 +1,421 @@
+{
+  "go": "go1.26.9",
+  "platform": "linux/arm64",
+  "fixture": {
+    "description": "Media-heavy documents; unchanged bytes, text edit with unchanged image, and full image replacement.",
+    "image_size": 2048,
+    "libraries": {
+      "python-docx": "1.2.0",
+      "python-pptx": "1.0.2",
+      "openpyxl": "3.1.5",
+      "reportlab": "5.0.1",
+      "pillow": "12.3.0",
+      "pypdf": "6.20.1"
+    },
+    "file_sizes": {
+      "00-base": {
+        "analysis.xlsx": 12630715,
+        "presentation.pptx": 12630953,
+        "report.docx": 12639478,
+        "report.pdf": 15735167
+      },
+      "01-unchanged": {
+        "analysis.xlsx": 12630715,
+        "presentation.pptx": 12630953,
+        "report.docx": 12639478,
+        "report.pdf": 15735167
+      },
+      "02-edit": {
+        "analysis.xlsx": 12630716,
+        "presentation.pptx": 12630953,
+        "report.docx": 12639479,
+        "report.pdf": 15735167
+      },
+      "03-regenerated": {
+        "analysis.xlsx": 12635047,
+        "presentation.pptx": 12635284,
+        "report.docx": 12643810,
+        "report.pdf": 15735169
+      }
+    }
+  },
+  "measurements": [
+    {
+      "mode": "whole_files",
+      "revision": "00-base",
+      "checkpoint_seconds": 0.34249175,
+      "cold_restore_seconds": 0.123004791,
+      "save_transfer": {
+        "head_requests": 4,
+        "get_requests": 0,
+        "put_requests": 4,
+        "uploaded_bytes": 53710453,
+        "downloaded_bytes": 0
+      },
+      "restore_transfer": {
+        "head_requests": 4,
+        "get_requests": 4,
+        "put_requests": 0,
+        "uploaded_bytes": 0,
+        "downloaded_bytes": 53636313
+      },
+      "files": [
+        {
+          "name": "analysis.xlsx",
+          "size": 12630715,
+          "chunks": 0,
+          "new_content_bytes": 12630715
+        },
+        {
+          "name": "presentation.pptx",
+          "size": 12630953,
+          "chunks": 0,
+          "new_content_bytes": 12630953
+        },
+        {
+          "name": "report.docx",
+          "size": 12639478,
+          "chunks": 0,
+          "new_content_bytes": 12639478
+        },
+        {
+          "name": "report.pdf",
+          "size": 15735167,
+          "chunks": 0,
+          "new_content_bytes": 15735167
+        }
+      ],
+      "verified": true
+    },
+    {
+      "mode": "whole_files",
+      "revision": "01-unchanged",
+      "checkpoint_seconds": 0.152214959,
+      "cold_restore_seconds": 0.118381125,
+      "save_transfer": {
+        "head_requests": 4,
+        "get_requests": 0,
+        "put_requests": 0,
+        "uploaded_bytes": 0,
+        "downloaded_bytes": 0
+      },
+      "restore_transfer": {
+        "head_requests": 4,
+        "get_requests": 4,
+        "put_requests": 0,
+        "uploaded_bytes": 0,
+        "downloaded_bytes": 53636313
+      },
+      "files": [
+        {
+          "name": "analysis.xlsx",
+          "size": 12630715,
+          "chunks": 0,
+          "new_content_bytes": 0
+        },
+        {
+          "name": "presentation.pptx",
+          "size": 12630953,
+          "chunks": 0,
+          "new_content_bytes": 0
+        },
+        {
+          "name": "report.docx",
+          "size": 12639478,
+          "chunks": 0,
+          "new_content_bytes": 0
+        },
+        {
+          "name": "report.pdf",
+          "size": 15735167,
+          "chunks": 0,
+          "new_content_bytes": 0
+        }
+      ],
+      "verified": true
+    },
+    {
+      "mode": "whole_files",
+      "revision": "02-edit",
+      "checkpoint_seconds": 0.319134417,
+      "cold_restore_seconds": 0.137088625,
+      "save_transfer": {
+        "head_requests": 4,
+        "get_requests": 0,
+        "put_requests": 4,
+        "uploaded_bytes": 53710455,
+        "downloaded_bytes": 0
+      },
+      "restore_transfer": {
+        "head_requests": 4,
+        "get_requests": 4,
+        "put_requests": 0,
+        "uploaded_bytes": 0,
+        "downloaded_bytes": 53636315
+      },
+      "files": [
+        {
+          "name": "analysis.xlsx",
+          "size": 12630716,
+          "chunks": 0,
+          "new_content_bytes": 12630716
+        },
+        {
+          "name": "presentation.pptx",
+          "size": 12630953,
+          "chunks": 0,
+          "new_content_bytes": 12630953
+        },
+        {
+          "name": "report.docx",
+          "size": 12639479,
+          "chunks": 0,
+          "new_content_bytes": 12639479
+        },
+        {
+          "name": "report.pdf",
+          "size": 15735167,
+          "chunks": 0,
+          "new_content_bytes": 15735167
+        }
+      ],
+      "verified": true
+    },
+    {
+      "mode": "whole_files",
+      "revision": "03-regenerated",
+      "checkpoint_seconds": 0.32930275,
+      "cold_restore_seconds": 0.120119166,
+      "save_transfer": {
+        "head_requests": 4,
+        "get_requests": 0,
+        "put_requests": 4,
+        "uploaded_bytes": 53723450,
+        "downloaded_bytes": 0
+      },
+      "restore_transfer": {
+        "head_requests": 4,
+        "get_requests": 4,
+        "put_requests": 0,
+        "uploaded_bytes": 0,
+        "downloaded_bytes": 53649310
+      },
+      "files": [
+        {
+          "name": "analysis.xlsx",
+          "size": 12635047,
+          "chunks": 0,
+          "new_content_bytes": 12635047
+        },
+        {
+          "name": "presentation.pptx",
+          "size": 12635284,
+          "chunks": 0,
+          "new_content_bytes": 12635284
+        },
+        {
+          "name": "report.docx",
+          "size": 12643810,
+          "chunks": 0,
+          "new_content_bytes": 12643810
+        },
+        {
+          "name": "report.pdf",
+          "size": 15735169,
+          "chunks": 0,
+          "new_content_bytes": 15735169
+        }
+      ],
+      "verified": true
+    },
+    {
+      "mode": "chunks",
+      "revision": "00-base",
+      "checkpoint_seconds": 0.389936167,
+      "cold_restore_seconds": 0.153399666,
+      "save_transfer": {
+        "head_requests": 19,
+        "get_requests": 0,
+        "put_requests": 19,
+        "uploaded_bytes": 43129582,
+        "downloaded_bytes": 0
+      },
+      "restore_transfer": {
+        "head_requests": 19,
+        "get_requests": 19,
+        "put_requests": 0,
+        "uploaded_bytes": 0,
+        "downloaded_bytes": 43067849
+      },
+      "files": [
+        {
+          "name": "analysis.xlsx",
+          "size": 12630715,
+          "chunks": 7,
+          "new_content_bytes": 12630715
+        },
+        {
+          "name": "presentation.pptx",
+          "size": 12630953,
+          "chunks": 7,
+          "new_content_bytes": 7346721
+        },
+        {
+          "name": "report.docx",
+          "size": 12639478,
+          "chunks": 7,
+          "new_content_bytes": 7355246
+        },
+        {
+          "name": "report.pdf",
+          "size": 15735167,
+          "chunks": 8,
+          "new_content_bytes": 15735167
+        }
+      ],
+      "verified": true
+    },
+    {
+      "mode": "chunks",
+      "revision": "01-unchanged",
+      "checkpoint_seconds": 0.216090375,
+      "cold_restore_seconds": 0.150402084,
+      "save_transfer": {
+        "head_requests": 19,
+        "get_requests": 0,
+        "put_requests": 0,
+        "uploaded_bytes": 0,
+        "downloaded_bytes": 0
+      },
+      "restore_transfer": {
+        "head_requests": 19,
+        "get_requests": 19,
+        "put_requests": 0,
+        "uploaded_bytes": 0,
+        "downloaded_bytes": 43067849
+      },
+      "files": [
+        {
+          "name": "analysis.xlsx",
+          "size": 12630715,
+          "chunks": 7,
+          "new_content_bytes": 0
+        },
+        {
+          "name": "presentation.pptx",
+          "size": 12630953,
+          "chunks": 7,
+          "new_content_bytes": 0
+        },
+        {
+          "name": "report.docx",
+          "size": 12639478,
+          "chunks": 7,
+          "new_content_bytes": 0
+        },
+        {
+          "name": "report.pdf",
+          "size": 15735167,
+          "chunks": 8,
+          "new_content_bytes": 0
+        }
+      ],
+      "verified": true
+    },
+    {
+      "mode": "chunks",
+      "revision": "02-edit",
+      "checkpoint_seconds": 0.318715416,
+      "cold_restore_seconds": 0.159550208,
+      "save_transfer": {
+        "head_requests": 19,
+        "get_requests": 0,
+        "put_requests": 7,
+        "uploaded_bytes": 24663094,
+        "downloaded_bytes": 0
+      },
+      "restore_transfer": {
+        "head_requests": 19,
+        "get_requests": 19,
+        "put_requests": 0,
+        "uploaded_bytes": 0,
+        "downloaded_bytes": 43067851
+      },
+      "files": [
+        {
+          "name": "analysis.xlsx",
+          "size": 12630716,
+          "chunks": 7,
+          "new_content_bytes": 7346484
+        },
+        {
+          "name": "presentation.pptx",
+          "size": 12630953,
+          "chunks": 7,
+          "new_content_bytes": 7346721
+        },
+        {
+          "name": "report.docx",
+          "size": 12639479,
+          "chunks": 7,
+          "new_content_bytes": 7355247
+        },
+        {
+          "name": "report.pdf",
+          "size": 15735167,
+          "chunks": 8,
+          "new_content_bytes": 2579670
+        }
+      ],
+      "verified": true
+    },
+    {
+      "mode": "chunks",
+      "revision": "03-regenerated",
+      "checkpoint_seconds": 0.378748334,
+      "cold_restore_seconds": 0.170135291,
+      "save_transfer": {
+        "head_requests": 25,
+        "get_requests": 0,
+        "put_requests": 25,
+        "uploaded_bytes": 31447065,
+        "downloaded_bytes": 0
+      },
+      "restore_transfer": {
+        "head_requests": 25,
+        "get_requests": 25,
+        "put_requests": 0,
+        "uploaded_bytes": 0,
+        "downloaded_bytes": 31400752
+      },
+      "files": [
+        {
+          "name": "analysis.xlsx",
+          "size": 12635047,
+          "chunks": 10,
+          "new_content_bytes": 12635047
+        },
+        {
+          "name": "presentation.pptx",
+          "size": 12635284,
+          "chunks": 10,
+          "new_content_bytes": 1511005
+        },
+        {
+          "name": "report.docx",
+          "size": 12643810,
+          "chunks": 10,
+          "new_content_bytes": 1519531
+        },
+        {
+          "name": "report.pdf",
+          "size": 15735169,
+          "chunks": 11,
+          "new_content_bytes": 15735169
+        }
+      ],
+      "verified": true
+    }
+  ],
+  "notes": "One sequential trial per strategy. Includes hashing and durable publication. Restore includes verified acquire, excludes independent byte comparison. Local MinIO; no WAN latency or monetary cost model. Media-heavy fixtures, not a performance SLO."
+}

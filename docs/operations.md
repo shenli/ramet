@@ -289,9 +289,10 @@ Cross-worker remote object collection and automated retention are deferred.
 
 ## Format and upgrades
 
-The store layout marker remains version 1. New immutable manifests use version 3
-for save reports and reconstruction contracts; versions 1, 2, and 3 are readable.
-Older binaries cannot read version 3 snapshots; do not downgrade a store after
+The store layout marker remains version 1. New immutable manifests use version 4
+for large-file chunk lists, retaining save reports and reconstruction contracts;
+versions 1 through 4 are readable. Older binaries cannot read version 4 snapshots;
+do not downgrade a store after
 creating them. Unsupported versions fail
 closed before recovery cleanup. PostgreSQL schema version 1 is initialized by a
 transactional migration on startup, serialized by an advisory lock. Run
@@ -342,11 +343,17 @@ server:
   max_inflight: 128
 worker:
   backend: copy
+  disable_chunking: false
   cache_bytes: 1073741824
   min_free_disk_bytes: 1073741824
   max_idle_executions: 32
   idle_ttl: 5m
 ```
+
+`disable_chunking` defaults to false. Set it to true to save new captures as
+whole-file objects when comparing latency or favoring repeated local reflink
+materialization. Existing chunked snapshots remain readable. See
+[artifact checkpoints](artifact-checkpoints.md) for the storage/restore tradeoff.
 
 `cache_bytes` is remote-mode only (default 0, unlimited). It bounds ready and
 in-flight cache objects; an individual object must fit. LRU eviction protects

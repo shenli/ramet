@@ -13,7 +13,7 @@ import (
 	"github.com/shenli/ramet/storage"
 )
 
-const FormatVersion = 3
+const FormatVersion = 4
 
 var (
 	ErrNotFound     = storage.ErrNotFound
@@ -109,6 +109,9 @@ type Entry struct {
 	ModTime int64  `json:"mtime_ns,omitempty"`
 	Digest  string `json:"digest,omitempty"`
 	Target  string `json:"target,omitempty"`
+	// Chunks is the complete ordered object list for a large file. Digest still
+	// hashes the full file; an empty list means Digest names a whole-file object.
+	Chunks []ContentRef `json:"chunks,omitempty"`
 }
 
 type Manifest struct {

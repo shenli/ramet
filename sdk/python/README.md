@@ -12,6 +12,7 @@ Start here:
 - [Connect your own framework or sandbox](#connect-your-own-framework-or-sandbox)
 - [Choose what to persist](#choose-what-to-persist)
 - [Preview and reconstruct saved state](#preview-and-reconstruct-saved-state)
+- [Reuse compatible dependencies](#reuse-compatible-dependencies)
 - [Run parallel attempts](#run-parallel-attempts)
 - [Lifecycle reference](#lifecycle-reference)
 - [Handle failures](#handle-failures)
@@ -221,6 +222,26 @@ Start with the [complete runnable example](../../examples/persistence/README.md)
 See [persistence policies](../../docs/persistence.md) for callback contracts,
 legacy snapshots, full-checkpoint inheritance, and Python/Node policy examples.
 
+## Reuse compatible dependencies
+
+Pair a digest-pinned runtime image with durable workspace files and dependencies.
+`DockerRuntime.dependency_environment()` inspects the pre-pulled image's platform
+and rejects mutable tags. `prepare_dependencies(execution, environment,
+directory=..., inputs=..., rebuild=..., verify=...)` checks the saved identity
+against the image, platform, mount path, and declared input hashes. It runs your
+verifier before reuse and your trusted builder on a cache miss. Both callbacks
+must stop their writers before returning.
+
+This helper requires SDK access to the worker's execution path and an active
+execution context. Keep the dependency directory durable on promotion; a
+rebuildable policy intentionally omits it. It does not preserve packages installed
+outside the workspace or process memory. Record the image identity alongside
+your published snapshot ID in the harness's database.
+
+See [session recovery](../../docs/session-recovery.md) for the API and contract,
+or run the [complete document example](../../examples/document_session/README.md)
+to create a DOCX, replace the worker and sandbox, and continue without reinstalling.
+
 ## Run parallel attempts
 
 Pool concurrency is a capacity limit; it does not launch tasks. Your harness
@@ -357,6 +378,7 @@ cancellation requirements for rollout workers.
 - [Best-of-N coding workflow](../../examples/best_of_n/README.md): Docker commands, evaluation, promotion, and restore.
 - [Parallel workspace example](../../examples/python/parallel_eval.py): trusted local files and thread scheduling.
 - [Integration guide](../../docs/integration.md): plan and validate your runtime adapter.
+- [Artifact checkpoints](../../docs/artifact-checkpoints.md): save large document revisions, reuse unchanged chunks, and recover completed tool steps.
 - [Google AX assessment](../../docs/ax-integration.md): custom-runner opportunities and filesystem integration requirements.
 - [Operations](../../docs/operations.md): worker configuration, HTTP API, storage, and recovery.
 

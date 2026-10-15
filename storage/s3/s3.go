@@ -5,10 +5,12 @@ package s3
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 	"net/url"
 	"strings"
 
@@ -25,6 +27,8 @@ type Options struct {
 	AccessKey    string
 	SecretKey    string
 	SessionToken string
+	// Transport optionally supplies HTTP instrumentation or transport settings.
+	Transport http.RoundTripper
 }
 type Store struct {
 	client                   *minio.Client
@@ -50,7 +54,7 @@ func New(opts Options) (*Store, error) {
 		}
 		creds = credentials.NewStaticV4(opts.AccessKey, opts.SecretKey, opts.SessionToken)
 	}
-	c, err := minio.New(u.Host, &minio.Options{Creds: creds, Secure: u.Scheme == "https", Region: opts.Region})
+	c, err := minio.New(u.Host, &minio.Options{Creds: creds, Secure: u.Scheme == "https", Region: opts.Region, Transport: opts.Transport})
 	if err != nil {
 		return nil, err
 	}
@@ -97,20 +101,8 @@ func (s *Store) Put(ctx context.Context, ref storage.Ref, src io.ReadSeeker) (bo
 	if n != ref.Size || hex.EncodeToString(h.Sum(nil)) != ref.Digest {
 		return false, storage.ErrCorrupt
 	}
-	existing, err := s.Open(ctx, ref.Digest)
+	err = s.Check(ctx, ref)
 	if err == nil {
-		h.Reset()
-		n, readErr := io.Copy(h, existing)
-		closeErr := existing.Close()
-		if readErr != nil {
-			return false, readErr
-		}
-		if closeErr != nil {
-			return false, closeErr
-		}
-		if n != ref.Size || hex.EncodeToString(h.Sum(nil)) != ref.Digest {
-			return false, fmt.Errorf("%w: S3 object digest mismatch", storage.ErrCorrupt)
-		}
 		return false, nil
 	}
 	if !errors.Is(err, storage.ErrNotFound) {
@@ -119,7 +111,15 @@ func (s *Store) Put(ctx context.Context, ref storage.Ref, src io.ReadSeeker) (bo
 	if _, err = src.Seek(0, io.SeekStart); err != nil {
 		return false, err
 	}
-	info, err := s.client.PutObject(ctx, s.bucket, s.prefix+ref.Digest, src, ref.Size, minio.PutObjectOptions{ContentType: "application/octet-stream", SendContentMd5: true, UserMetadata: map[string]string{"sha256": ref.Digest}})
+	opts := minio.PutObjectOptions{ContentType: "application/octet-stream", SendContentMd5: true, UserMetadata: map[string]string{"sha256": ref.Digest}}
+	// All new chunks fit in a single PUT. Send the native checksum header:
+	// S3 validates it against uploaded bytes and exposes it on a later HEAD.
+	// Large legacy/Git objects retain multipart upload and verification fallback.
+	if ref.Size <= 16<<20 {
+		opts.DisableMultipart = true
+		opts.UserMetadata["X-Amz-Checksum-Sha256"] = base64.StdEncoding.EncodeToString(h.Sum(nil))
+	}
+	info, err := s.client.PutObject(ctx, s.bucket, s.prefix+ref.Digest, src, ref.Size, opts)
 	if err != nil {
 		return false, err
 	}
@@ -127,6 +127,43 @@ func (s *Store) Put(ctx context.Context, ref storage.Ref, src io.ReadSeeker) (bo
 		return false, fmt.Errorf("%w: incomplete S3 upload", storage.ErrCorrupt)
 	}
 	return true, nil
+}
+
+// Check uses only a server-validated full-object SHA-256 as the fast path.
+// ETags, user metadata, and multipart composite checksums are not substitutes.
+// Old objects and compatible services without native SHA-256 fall back to a
+// bounded, complete read. Restore and doctor still verify actual bytes.
+func (s *Store) Check(ctx context.Context, ref storage.Ref) error {
+	if !storage.ValidDigest(ref.Digest) || ref.Size < 0 {
+		return storage.ErrCorrupt
+	}
+	info, err := s.client.StatObject(ctx, s.bucket, s.prefix+ref.Digest, minio.StatObjectOptions{Checksum: true})
+	if err != nil {
+		return mapError(err)
+	}
+	if info.Size != ref.Size {
+		return fmt.Errorf("%w: S3 object size mismatch", storage.ErrCorrupt)
+	}
+	if info.ChecksumSHA256 != "" && info.ChecksumMode != "COMPOSITE" && !strings.Contains(info.ChecksumSHA256, "-") {
+		sum, err := base64.StdEncoding.DecodeString(info.ChecksumSHA256)
+		if err != nil || len(sum) != sha256.Size || hex.EncodeToString(sum) != ref.Digest {
+			return fmt.Errorf("%w: S3 object checksum mismatch", storage.ErrCorrupt)
+		}
+		return nil
+	}
+	in, err := s.Open(ctx, ref.Digest)
+	if err != nil {
+		return err
+	}
+	h := sha256.New()
+	n, readErr := io.Copy(h, &contextReader{ctx, io.LimitReader(in, ref.Size+1)})
+	if err = errors.Join(readErr, in.Close()); err != nil {
+		return err
+	}
+	if n != ref.Size || hex.EncodeToString(h.Sum(nil)) != ref.Digest {
+		return fmt.Errorf("%w: S3 object digest mismatch", storage.ErrCorrupt)
+	}
+	return nil
 }
 func mapError(err error) error {
 	code := minio.ToErrorResponse(err).Code

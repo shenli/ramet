@@ -135,9 +135,14 @@ Snapshot, checkpoint, and promotion are explicit publication operations.
 PostgreSQL stores schema version, namespace/content binding, and snapshot
 records. A snapshot record contains its ID, parent ID, manifest bytes, and
 creation time. Foreign keys protect parent lineage. The snapshot ID is the
-SHA-256 of serialized manifest bytes; each regular file entry names its own
-SHA-256 object. Parents record lineage, not an incremental chain required to
+SHA-256 of serialized manifest bytes. Regular files have a whole-file SHA-256;
+small files name one object, while large files include an ordered list of
+content-addressed chunks. Parents record lineage, not an incremental chain required to
 reconstruct bytes: each manifest describes a complete selected tree.
+
+Files of at least 8 MiB use content-defined chunks by default. Captures reuse
+unchanged chunks; reconstruction checks every chunk and the complete file.
+See [artifact checkpoints](artifact-checkpoints.md) for costs and configuration.
 
 One PostgreSQL connection both holds the namespace advisory lock and performs
 metadata operations. It never automatically reconnects after ownership loss.

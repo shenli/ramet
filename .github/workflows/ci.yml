@@ -47,6 +47,11 @@ jobs:
         run: RAMET_TEST_DOCKER=1 PYTHONPATH=sdk/python:sdk/python/tests python -m unittest test_integration.IntegrationTests.test_docker_timeout_isolation_and_recycle test_integration.IntegrationTests.test_docker_stops_on_expired_lease test_integration.IntegrationTests.test_docker_bounds_combined_output_and_recycles -v
       - name: Selective persistence and verified reconstruction
         run: PYTHONPATH=sdk/python python examples/persistence/run.py --docker
+      - name: Pinned image and document session recovery
+        run: |
+          docker build -t ramet-document-session:ci examples/document_session
+          SESSION_IMAGE=$(docker image inspect ramet-document-session:ci --format '{{.Id}}')
+          PYTHONPATH=sdk/python python examples/document_session/run.py --image "$SESSION_IMAGE"
       - name: Best-of-N coding workflow
         run: |
           PYTHONPATH=sdk/python python examples/best_of_n/run.py --output .test-cache/coding-demo
@@ -61,7 +66,7 @@ jobs:
           go-version-file: go.mod
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
       - run: docker compose -p ramet-phase1-test -f compose.integration.yaml up -d --build --wait
       - name: Enable native FUSE tests
         run: |
@@ -74,6 +79,21 @@ jobs:
       - run: make build
       - name: Python lifecycle on FUSE
         run: RAMET_TEST_BACKEND=lazy PYTHONPATH=sdk/python python -m unittest discover -s sdk/python/tests -v
-      - run: RAMET_TEST_FUSE=1 ./scripts/test-integration.sh
+      - name: Generate document checkpoint fixtures
+        run: |
+          python -m pip install uv
+          uv run --locked --script scripts/generate-artifact-fixtures.py --output .test-cache/artifact-fixtures
+      - name: Durable storage, document recovery, and FUSE
+        run: RAMET_TEST_FUSE=1 RAMET_ARTIFACT_FIXTURES="$PWD/.test-cache/artifact-fixtures" ./scripts/test-integration.sh
+      - name: Document session on an empty replacement worker
+        env:
+          RAMET_DATABASE_URL: postgres://ramet_test:ramet-local-integration-only@127.0.0.1:17432/ramet_phase1_test?sslmode=disable
+          RAMET_S3_ACCESS_KEY: ramet_test
+          RAMET_S3_SECRET_KEY: ramet-local-integration-only
+        run: |
+          docker build -t ramet-document-session:ci examples/document_session
+          SESSION_IMAGE=$(docker image inspect ramet-document-session:ci --format '{{.Id}}')
+          PYTHONPATH=sdk/python python examples/document_session/run.py --image "$SESSION_IMAGE" \
+            --worker-config examples/document_session/providers.test.yaml
       - if: always()
         run: docker compose -p ramet-phase1-test -f compose.integration.yaml down

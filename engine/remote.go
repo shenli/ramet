@@ -15,6 +15,22 @@ import (
 	"github.com/shenli/ramet/storage"
 )
 
+// Confirmations live only for this synchronous capture. They never survive an
+// operation, restart, or provider change and do not depend on cache residency.
+type captureContentKey struct{}
+
+func confirmedContent(ctx context.Context, digest string, size int64) bool {
+	refs, _ := ctx.Value(captureContentKey{}).(map[string]int64)
+	n, ok := refs[digest]
+	return ok && n == size
+}
+
+func confirmContent(ctx context.Context, digest string, size int64) {
+	if refs, ok := ctx.Value(captureContentKey{}).(map[string]int64); ok {
+		refs[digest] = size
+	}
+}
+
 func (s *Store) initializeRemote(ctx context.Context) error {
 	binding := filepath.Join(s.root, "REMOTE")
 	previous, err := os.ReadFile(binding)
@@ -56,15 +72,24 @@ func (s *Store) publishSnapshot(ctx context.Context, id string, m Manifest, data
 	if s.opts.Metadata == nil {
 		return fsutil.AtomicWrite(filepath.Join(s.root, "snapshots", id+".json"), data, 0600)
 	}
-	// Every object created by putFile is uploaded before it enters the cache.
-	// Inherited references already belong to a published snapshot. Confirm any
-	// cached/durable references through a pinned read before metadata publication.
+	// Objects confirmed during this capture need no second upload or read.
+	// Inherited references must still be confirmed before metadata publication;
+	// providers can use a validated checksum, or fall back to a pinned upload.
 	seen := map[string]bool{}
 	for _, e := range s.contentRefs(m) {
 		if seen[e.Digest] {
 			continue
 		}
 		seen[e.Digest] = true
+		if confirmedContent(ctx, e.Digest, e.Size) {
+			continue
+		}
+		if checker, ok := s.opts.Content.(storage.ContentChecker); ok {
+			if err := checker.Check(ctx, storage.Ref{Digest: e.Digest, Size: e.Size}); err != nil {
+				return err
+			}
+			continue
+		}
 		if err := s.withObject(ctx, e, func(name string) error {
 			f, err := os.Open(name)
 			if err != nil {

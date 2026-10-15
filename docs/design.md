@@ -206,8 +206,17 @@ to establish the optimized provenance model.
 
 ## Recovery, migration, and compatibility
 
-The filesystem store marker remains version 1. New manifests use version 3 for
-save reports and reconstruction contracts; readers accept versions 1, 2, and 3. Unsupported versions
+Large regular files use complete ordered chunk lists in their entries. The file
+digest still hashes its original bytes; chunks change storage representation,
+not filesystem identity. Manifest validation bounds chunk sizes, checks digests
+and their total length, and rejects chunk fields in older manifest versions.
+Local GC and remote cache accounting follow physical chunk references. Restore
+verifies each chunk and the concatenated whole-file digest before making a
+workspace usable. See [artifact checkpoints](artifact-checkpoints.md).
+
+The filesystem store marker remains version 1. New manifests use version 4 for
+large-file chunk lists, retaining version 3 save reports and reconstruction
+contracts. Readers accept versions 1 through 4. Unsupported versions
 fail before recovery cleanup. PostgreSQL schema version 1 is initialized in a
 transaction guarded by a database-wide migration lock. Newer schema versions
 are rejected; `ramet migrate --config ...` exposes this migration explicitly.

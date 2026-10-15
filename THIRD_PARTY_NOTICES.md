@@ -20,6 +20,7 @@ Versions are pinned in `go.mod`; original license and notice texts are included.
 | `github.com/minio/md5-simd` | v1.1.2 | [LICENSE](third_party/github.com-minio-md5-simd/LICENSE), [LICENSE.Golang](third_party/github.com-minio-md5-simd/LICENSE.Golang) |
 | `github.com/minio/minio-go/v7` | v7.3.0 | [LICENSE](third_party/github.com-minio-minio-go-v7/LICENSE), [NOTICE](third_party/github.com-minio-minio-go-v7/NOTICE) |
 | `github.com/philhofer/fwd` | v1.2.0 | [LICENSE.md](third_party/github.com-philhofer-fwd/LICENSE.md) |
+| `github.com/restic/chunker` | v0.5.0 | [LICENSE](third_party/github.com-restic-chunker/LICENSE) |
 | `github.com/rs/xid` | v1.6.0 | [LICENSE](third_party/github.com-rs-xid/LICENSE) |
 | `github.com/tinylib/msgp` | v1.6.4 | [LICENSE](third_party/github.com-tinylib-msgp/LICENSE) |
 | `github.com/zeebo/xxh3` | v1.1.0 | [LICENSE](third_party/github.com-zeebo-xxh3/LICENSE) |
