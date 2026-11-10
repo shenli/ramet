@@ -21,7 +21,7 @@ jobs:
       - run: python -m build sdk/python
       - name: Private planning guard
         run: test -z "$(git ls-files docs/ramet-marketing-internal.md docs/phase-1-plan.md docs/phase-2-plan.md)"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ramet-release-candidates
           path: |
