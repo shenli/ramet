@@ -13,7 +13,7 @@ import (
 	"github.com/shenli/ramet/storage"
 )
 
-const FormatVersion = 4
+const FormatVersion = 5
 
 var (
 	ErrNotFound     = storage.ErrNotFound
@@ -115,13 +115,14 @@ type Entry struct {
 }
 
 type Manifest struct {
-	Save       *SaveReport `json:"save,omitempty"`
-	GitObjects *GitObjects `json:"git_objects,omitempty"`
-	Version    int         `json:"version"`
-	Parent     string      `json:"parent,omitempty"`
-	Git        *GitBase    `json:"git,omitempty"`
-	Policy     Policy      `json:"policy"`
-	Entries    []Entry     `json:"entries"`
+	Publication *Publication `json:"publication,omitempty"`
+	Save        *SaveReport  `json:"save,omitempty"`
+	GitObjects  *GitObjects  `json:"git_objects,omitempty"`
+	Version     int          `json:"version"`
+	Parent      string       `json:"parent,omitempty"`
+	Git         *GitBase     `json:"git,omitempty"`
+	Policy      Policy       `json:"policy"`
+	Entries     []Entry      `json:"entries"`
 }
 type Snapshot struct {
 	ID       string   `json:"id"`

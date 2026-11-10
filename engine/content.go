@@ -280,6 +280,9 @@ func validateManifest(m Manifest) error {
 	if m.Version < 1 || m.Version > FormatVersion {
 		return fmt.Errorf("unsupported manifest version %d", m.Version)
 	}
+	if err := validatePublication(m); err != nil {
+		return err
+	}
 	if err := m.Policy.Validate(); err != nil {
 		return err
 	}

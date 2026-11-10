@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Durable tool publications bind a stable ID, request digest, files, and bounded
+  JSON result in manifest v5; lookup survives worker replacement. Published
+  snapshots remain pinned against deletion, with no expiry/release API yet.
+- Framework-neutral Python `WorkspaceStep` and a LangGraph document-recovery
+  reference with crash/reply-loss scenarios. See the
+  [validation record](docs/testing/2026-11-10-tool-recovery.md) before relying on
+  this unreleased change.
+
 - Python dependency compatibility checks keyed by pinned image, platform,
   workspace path, and input hashes, with verified reuse or caller-owned rebuild;
   executable DOCX session recovery and a pinned-environment integration guide.

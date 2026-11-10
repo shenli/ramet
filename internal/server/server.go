@@ -98,6 +98,10 @@ func New(store *engine.Store, opts Options) *API {
 		snap, err := store.Snapshot(r.Context(), opts)
 		a.result(w, snap, err)
 	})
+	mux.HandleFunc("GET /v1/publications/{id}", func(w http.ResponseWriter, r *http.Request) {
+		snap, err := store.GetPublication(r.Context(), r.PathValue("id"))
+		a.result(w, snap, err)
+	})
 	mux.HandleFunc("GET /v1/snapshots", func(w http.ResponseWriter, r *http.Request) {
 		snaps, err := store.ListSnapshots(r.Context())
 		a.result(w, snaps, err)
@@ -264,10 +268,16 @@ func (a *API) decode(w http.ResponseWriter, r *http.Request, v any) bool {
 
 func (a *API) execution(w http.ResponseWriter, r *http.Request) {
 	var lease struct {
-		Lease      string `json:"lease"`
-		Generation uint64 `json:"generation"`
+		Lease       string              `json:"lease"`
+		Generation  uint64              `json:"generation"`
+		Publication *engine.Publication `json:"publication,omitempty"`
+		Mode        string              `json:"mode,omitempty"`
 	}
 	if !a.decode(w, r, &lease) {
+		return
+	}
+	if r.PathValue("action") != "publish" && (lease.Publication != nil || lease.Mode != "") {
+		a.result(w, nil, fmt.Errorf("%w: publication fields require publish action", engine.ErrInvalid))
 		return
 	}
 	p, err := a.store.Pool(r.PathValue("pool"))
@@ -290,6 +300,12 @@ func (a *API) execution(w http.ResponseWriter, r *http.Request) {
 		result, err = p.Verify(r.Context(), e)
 	case "fork":
 		result, err = p.Fork(r.Context(), e)
+	case "publish":
+		if lease.Publication == nil {
+			err = fmt.Errorf("%w: publication is required", engine.ErrInvalid)
+		} else {
+			result, err = p.Publish(r.Context(), e, engine.PublishOptions{Publication: *lease.Publication, Mode: lease.Mode})
+		}
 	case "checkpoint":
 		result, err = p.Checkpoint(r.Context(), e)
 	case "preview-promotion":

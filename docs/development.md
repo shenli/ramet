@@ -97,6 +97,7 @@ in `internal/` and state semantics in `engine/`.
 | Bounded remote cache and idle expiry | `engine/cache.go`, `engine/idle.go` | `engine/pressure_test.go`, `integration/phase2_test.go` |
 | Linux lazy hydration | `internal/lazyfs/`, `engine/execution_fs.go` | Linux tests in those packages, `engine/lazy_test.go` |
 | Tenant routing and metrics | `internal/server/tenants.go`, `internal/server/observability.go`, `cmd/ramet/tenants.go` | `internal/server/tenants_test.go`, Linux soak |
+| Durable tool publication and lookup | `engine/publication.go`, `sdk/python/ramet/recovery.py` | `engine/publication_test.go`, `integration/publication_test.go`, LangGraph example |
 | Remote publication and hydration | `engine/remote.go`, `storage/` | `integration/integration_test.go` |
 | YAML, CLI options, commands | `internal/config/`, `cmd/ramet/` | Tests in those directories |
 | HTTP route or error mapping | `internal/server/`, `client/` | `internal/server/server_test.go` |

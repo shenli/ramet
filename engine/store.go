@@ -62,27 +62,29 @@ type counters struct {
 // One process may open a data directory at a time. Snapshots survive restart;
 // ephemeral executions and pools deliberately do not.
 type Store struct {
-	lazyMu       sync.Mutex
-	lazyMounts   map[string]*lazyfs.Mount
-	root         string
-	opts         Options
-	lock         *os.File
-	life         sync.RWMutex
-	closed       bool
-	contentMu    sync.RWMutex // protects in-flight capture/materialization from GC
-	mu           sync.Mutex
-	pools        map[string]*Pool
-	draining     bool
-	metrics      counters
-	cacheMu      sync.Mutex
-	cacheObjects map[string]*cacheObject
-	cacheBytes   int64
-	diskMu       sync.Mutex
-	diskReserved int64
-	idleCount    atomic.Int64
-	allocated    atomic.Int64
-	reaperStop   chan struct{}
-	reaperDone   chan struct{}
+	publicationMu sync.Mutex
+	publications  map[string]string // rebuilt from immutable manifests; guarded by publicationMu
+	lazyMu        sync.Mutex
+	lazyMounts    map[string]*lazyfs.Mount
+	root          string
+	opts          Options
+	lock          *os.File
+	life          sync.RWMutex
+	closed        bool
+	contentMu     sync.RWMutex // protects in-flight capture/materialization from GC
+	mu            sync.Mutex
+	pools         map[string]*Pool
+	draining      bool
+	metrics       counters
+	cacheMu       sync.Mutex
+	cacheObjects  map[string]*cacheObject
+	cacheBytes    int64
+	diskMu        sync.Mutex
+	diskReserved  int64
+	idleCount     atomic.Int64
+	allocated     atomic.Int64
+	reaperStop    chan struct{}
+	reaperDone    chan struct{}
 }
 
 func Open(root string, opts Options) (*Store, error) {
@@ -462,8 +464,12 @@ func (s *Store) DeleteSnapshot(ctx context.Context, id string) error {
 	defer s.leave()
 	s.contentMu.Lock()
 	defer s.contentMu.Unlock()
-	if _, err := s.readSnapshot(ctx, id); err != nil {
+	snap, err := s.readSnapshot(ctx, id)
+	if err != nil {
 		return err
+	}
+	if snap.Manifest.Publication != nil {
+		return fmt.Errorf("%w: durable publication is retained for recovery", ErrConflict)
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()

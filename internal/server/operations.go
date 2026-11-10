@@ -251,7 +251,8 @@ func (a *API) capabilities(w http.ResponseWriter, r *http.Request) {
 			"max_response_bytes": operationMaxBody, "max_total_bytes": operationMaxBytes,
 			"max_count": operationMaxCount, "issue": "/v1/operations/new", "lookup": "/v1/operations/{id}",
 		},
-		"policy_schema": "https://raw.githubusercontent.com/shenli/ramet/main/schemas/policy-v1.schema.json",
-		"persistence":   "explicit_checkpoint_or_promotion",
+		"durable_publications": map[string]any{"lookup": "/v1/publications/{id}", "max_result_bytes": 65536, "retention": "snapshot_lifetime_pinned"},
+		"policy_schema":        "https://raw.githubusercontent.com/shenli/ramet/main/schemas/policy-v1.schema.json",
+		"persistence":          "explicit_checkpoint_or_promotion",
 	})
 }

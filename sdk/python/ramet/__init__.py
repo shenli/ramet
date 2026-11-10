@@ -4,8 +4,10 @@ SPDX-License-Identifier: Apache-2.0
 """
 
 from .client import Execution, ExecutionPool, Ramet, RametEnv, RametError, OutcomeUnknownError, RebuildError, Snapshot
+from .client import PublicationUnknownError
+from .recovery import WorkspaceStep
 from .docker import DockerRuntime
 from .environment import DependencyEnvironment, prepare_dependencies
 
-__all__ = ["DependencyEnvironment", "prepare_dependencies", "DockerRuntime", "Execution", "ExecutionPool", "Ramet", "RametEnv", "RametError", "OutcomeUnknownError", "RebuildError", "Snapshot"]
+__all__ = ["WorkspaceStep", "PublicationUnknownError", "DependencyEnvironment", "prepare_dependencies", "DockerRuntime", "Execution", "ExecutionPool", "Ramet", "RametEnv", "RametError", "OutcomeUnknownError", "RebuildError", "Snapshot"]
 __version__ = "0.3.0a1"

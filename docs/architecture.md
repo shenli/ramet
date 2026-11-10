@@ -176,6 +176,19 @@ entries and writable file inodes are independent. Unsupported volumes use full
 copies unless `require_cow` is enabled. Full verification reads the resulting
 tree; neither cloning nor recycling makes verification constant-time.
 
+## Tool publication and harness progress
+
+A durable publication binds a stable tool-step ID, request digest, JSON result,
+and file snapshot in the same immutable manifest. The harness advances its own
+checkpoint after publication. If that later checkpoint or the publication reply
+is lost, lookup by publication ID recovers the original result and files.
+
+The publication index is rebuilt from authoritative manifests after restart;
+there is no separate receipt transaction. Published snapshots remain pinned.
+This boundary does not checkpoint process memory or reconcile external effects,
+and a tool can run again if it completed before publication. See
+[tool recovery](tool-recovery.md) for identity, fencing, and retention limits.
+
 ## Ownership and lifetime
 
 A process lock protects each data directory. The remote metadata session adds

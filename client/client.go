@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -221,3 +222,40 @@ func (c *Client) RestorePlan(ctx context.Context, id string) (engine.RestorePlan
 	err := c.Do(ctx, "GET", "/v1/snapshots/"+url.PathEscape(id)+"/restore-plan", nil, &out)
 	return out, err
 }
+
+// Publication resolves an immutable publication independently of worker sessions.
+func (c *Client) Publication(ctx context.Context, id string) (engine.Snapshot, error) {
+	var out engine.Snapshot
+	err := c.Do(ctx, "GET", "/v1/publications/"+url.PathEscape(id), nil, &out)
+	return out, err
+}
+
+// Publish uses opts.Publication.ID as a durable logical key. On uncertain errors,
+// resolve that ID before continuing. Generic operation IDs remain session-scoped.
+func (p *Pool) Publish(ctx context.Context, e engine.Execution, opts engine.PublishOptions) (engine.Snapshot, error) {
+	var out engine.Snapshot
+	err := p.client.Do(ctx, "POST", p.path()+"/executions/"+url.PathEscape(e.ID)+"/publish", struct {
+		Lease       string             `json:"lease"`
+		Generation  uint64             `json:"generation"`
+		Publication engine.Publication `json:"publication"`
+		Mode        string             `json:"mode"`
+	}{e.Lease, e.Generation, opts.Publication, opts.Mode}, &out)
+	if err != nil {
+		var apiErr *Error
+		if !errors.As(err, &apiErr) || apiErr.Status == 408 || apiErr.Status >= 500 {
+			return out, &PublicationUnknownError{ID: opts.Publication.ID, Err: err}
+		}
+	}
+	return out, err
+}
+
+// PublicationUnknownError carries the durable lookup key after an uncertain save.
+type PublicationUnknownError struct {
+	ID  string
+	Err error
+}
+
+func (e *PublicationUnknownError) Error() string {
+	return "publication " + e.ID + " outcome unknown; resolve its durable ID: " + e.Err.Error()
+}
+func (e *PublicationUnknownError) Unwrap() error { return e.Err }

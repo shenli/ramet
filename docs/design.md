@@ -214,9 +214,10 @@ Local GC and remote cache accounting follow physical chunk references. Restore
 verifies each chunk and the concatenated whole-file digest before making a
 workspace usable. See [artifact checkpoints](artifact-checkpoints.md).
 
-The filesystem store marker remains version 1. New manifests use version 4 for
-large-file chunk lists, retaining version 3 save reports and reconstruction
-contracts. Readers accept versions 1 through 4. Unsupported versions
+The filesystem store marker remains version 1. New manifests use version 5 for
+[durable tool publications](tool-recovery.md), retaining version 4 chunk lists
+and version 3 save reports and reconstruction contracts. Readers accept versions
+1 through 5. Unsupported versions
 fail before recovery cleanup. PostgreSQL schema version 1 is initialized in a
 transaction guarded by a database-wide migration lock. Newer schema versions
 are rejected; `ramet migrate --config ...` exposes this migration explicitly.

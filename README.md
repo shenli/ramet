@@ -26,7 +26,7 @@ work, your sandbox runs it, and Ramet manages the workspace lifecycle.
 
 | Your stack | Integration path |
 | --- | --- |
-| **LangChain / LangGraph** — persistent files for tool-using agents | [Custom tool/runtime integration](docs/integration.md#framework-integration-paths); save a Ramet snapshot ID alongside your thread state. |
+| **LangChain / LangGraph** — persistent files for tool-using agents | [LangGraph recovery example](examples/langgraph_recovery/README.md): publish tool results with workspace files before advancing graph progress. |
 | **CrewAI / AutoGen** — isolated files for parallel coding agents | [Custom tool/executor integration](docs/integration.md#framework-integration-paths); assign an execution per independent attempt. |
 | **SkyRL** — workspaces for agentic RL rollouts | [Runnable SkyRL-Gym environment](docs/skyrl-integration.md), tested with a real worker and Docker. |
 | **Your own agent or evaluation harness** | [Python / Go / HTTP integration](docs/integration.md), with an included same-host Docker adapter. |
@@ -169,6 +169,7 @@ For ready-made demonstrations, run `./bin/ramet demo` or follow the
 
 - [Persistence policies](docs/persistence.md) · [Selective save and restore](examples/persistence/README.md) — inspect and reconstruct saved work.
 - [Artifact checkpoints](docs/artifact-checkpoints.md) — save large document revisions and restore work after sandbox replacement.
+- [Tool recovery](docs/tool-recovery.md) · [LangGraph example](examples/langgraph_recovery/README.md) — reconcile completed workspace publications before retrying a tool.
 - [Session recovery](docs/session-recovery.md) — pair a pinned image with persistent files and compatible dependencies; [runnable DOCX example](examples/document_session/README.md).
 - [Integration guide](docs/integration.md) · [Google AX assessment](docs/ax-integration.md) — scope your runtime integration.
 - [Coding demo](examples/best_of_n/README.md) — run the workflow and integrate your agent.

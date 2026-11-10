@@ -169,6 +169,7 @@ is no automatic mutation retry: a timed-out response may have committed.
 | --- | --- | --- |
 | POST | `/v1/snapshots` | `{source, policy}` or `{git: {repository, revision}, policy}` → snapshot |
 | GET | `/v1/snapshots` | Snapshot list |
+| GET | `/v1/publications/{id}` | Resolve a durable tool publication; 404 means absent at this read |
 | GET / DELETE | `/v1/snapshots/{id}` | Read / delete unreferenced snapshot |
 | GET | `/v1/snapshots/{id}/restore-plan` | Recorded save mode and reconstruction steps; no execution or readiness guarantee |
 | GET | `/v1/snapshots/{id}/locality` | Unique object/byte residency and idle execution count |
@@ -179,6 +180,7 @@ is no automatic mutation retry: a timed-out response may have committed.
 | POST | `/v1/pools/{pool}/acquire` | No body; waits for capacity → execution |
 | POST | `/v1/pools/{pool}/acquire-many` | `{count}` → execution array; all-or-nothing reservation |
 | POST | `/v1/pools/{pool}/executions/{id}/{action}` | `{lease, generation}` |
+| POST | `/v1/pools/{pool}/executions/{id}/publish` | `{lease, generation, mode, publication: {id, request_digest, result}}` → immutable snapshot with tool result |
 | GET | `/v1/doctor` | Deep content/lineage check and COW probe |
 | POST | `/v1/gc` | `{grace_seconds: 3600, dry_run: true}` → eligible object/byte count |
 | GET | `/v1/worker/cache` | Cache bytes, pins, headroom, idle limits and pressure counters |
@@ -186,13 +188,18 @@ is no automatic mutation retry: a timed-out response may have committed.
 | POST | `/v1/worker/idle/trim` | No body; remove all idle trees → `{removed}` |
 | POST | `/v1/worker/drain` | Stop accepting claims, forks, and new pools |
 
-Execution actions are `reset`, `fork`, `verify`, `checkpoint`, `promote`,
+Execution actions are `reset`, `fork`, `verify`, `checkpoint`, `promote`, `publish`,
 `heartbeat`, `release`, and `discard`. Release/discard and successful deletes return 204;
 other successes return JSON with status 200. Errors have `{code, error, request_id}` and
 statuses 400 (invalid), 401 (unauthorized), 404 (missing), 408 (deadline),
 409 (conflict/stale or expired lease), 413 (body too large), 422 (verification),
 429 (worker quota), or 503
 (draining). Unexpected I/O errors return 500 and are logged at the worker.
+
+Durable publications use a separate stable key that survives worker replacement.
+They do not extend the lifetime of session-scoped operation receipts. Published
+snapshots are pinned against deletion with no expiry/release API yet. Read the
+[tool recovery contract](tool-recovery.md) before enabling per-tool publication.
 
 Example CLI lifecycle (requires `jq`):
 
@@ -289,9 +296,9 @@ Cross-worker remote object collection and automated retention are deferred.
 
 ## Format and upgrades
 
-The store layout marker remains version 1. New immutable manifests use version 4
-for large-file chunk lists, retaining save reports and reconstruction contracts;
-versions 1 through 4 are readable. Older binaries cannot read version 4 snapshots;
+The store layout marker remains version 1. New immutable manifests use version 5
+for durable publications, retaining chunk lists, save reports and reconstruction
+contracts; versions 1 through 5 are readable. Older binaries cannot read version 5 snapshots;
 do not downgrade a store after
 creating them. Unsupported versions fail
 closed before recovery cleanup. PostgreSQL schema version 1 is initialized by a

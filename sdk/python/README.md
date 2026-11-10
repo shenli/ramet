@@ -13,6 +13,7 @@ Start here:
 - [Choose what to persist](#choose-what-to-persist)
 - [Preview and reconstruct saved state](#preview-and-reconstruct-saved-state)
 - [Reuse compatible dependencies](#reuse-compatible-dependencies)
+- [Recover a completed tool](#recover-a-completed-tool)
 - [Run parallel attempts](#run-parallel-attempts)
 - [Lifecycle reference](#lifecycle-reference)
 - [Handle failures](#handle-failures)
@@ -242,6 +243,44 @@ See [session recovery](../../docs/session-recovery.md) for the API and contract,
 or run the [complete document example](../../examples/document_session/README.md)
 to create a DOCX, replace the worker and sandbox, and continue without reinstalling.
 
+## Recover a completed tool
+
+Use `WorkspaceStep` when a tool produces files and a result that your durable
+harness checkpoint must reference together. Persist its scope, step occurrence,
+base snapshot, runtime identity, inputs, and tool version before running it.
+
+```python
+from ramet import WorkspaceStep
+
+step = WorkspaceStep(
+    scope=state["session_branch"],
+    step=state["tool_call_id"],
+    base=state["snapshot"],
+    environment=runtime.dependency_environment(),
+    inputs=state["tool_inputs"],
+    tool_version="report-tool-v1",
+)
+record = step.run(ramet, generate_report, prepare=prepare_dependencies_for_report)
+# Return record from your framework node so it can checkpoint the new progress.
+```
+
+Your tool callback receives an execution and returns a JSON result up to 64 KiB.
+The helper first looks up an existing publication. Otherwise it acquires an
+execution, calls your optional preparation callback and tool, stops SDK-managed
+writers, and publishes files and result in one manifest. A retry reuses the
+completed publication. Changed inputs or runtime identity under the same key
+fail closed.
+
+On `PublicationUnknownError`, retain the same identity and resolve it with
+`step.recover(ramet)`. A missing publication is not evidence that an old tool
+stopped: fence the old runtime and serialize session recovery before retrying.
+Tools may run again if they finish before publication; external effects need
+their own reconciliation. Publications are currently pinned without expiry.
+
+See the [recovery contract](../../docs/tool-recovery.md) and the
+[LangGraph example](../../examples/langgraph_recovery/README.md) for durable
+checkpointer integration, crash cases, lower-level APIs, and validation status.
+
 ## Run parallel attempts
 
 Pool concurrency is a capacity limit; it does not launch tasks. Your harness
@@ -279,6 +318,8 @@ handle yourself, and release/discard every handle before closing the pool.
 | `execution.reset()` | Return to the pool's base; updates this handle's path and generation. |
 | `execution.fork()` | Copy current state into another leased execution in the same pool; consumes capacity. |
 | `execution.verify()` | Compare against the pool's base. Your intended edits can produce differences. |
+| `execution.publish(id, digest, result)` | Publish files and a bounded JSON tool result under a stable durable key. |
+| `ramet.publication(id)` | Resolve that publication across worker restarts; absent returns `None`. |
 | `execution.checkpoint()` | Save all supported current files, without promotion exclusions. |
 | `execution.preview_promotion()` | Inspect policy decisions and logical bytes without publication. |
 | `ramet.restore_plan(snapshot)` | Read the snapshot's reconstruction contract. |

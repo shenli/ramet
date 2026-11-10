@@ -46,7 +46,7 @@ failure can still lose changes since the last published snapshot.
 - A failed upload never publishes a partial snapshot. Uploaded orphan objects
   can remain; remote object deletion is not currently implemented.
 
-Existing manifests remain readable. New captures use manifest version 4; older
+Existing manifests remain readable. New captures use manifest version 5; older
 workers cannot read those manifests. Upgrade readers before sharing new saves.
 Git's optimized base/local packs retain their existing whole-object format.
 

@@ -114,6 +114,29 @@ class IntegrationTests(unittest.TestCase):
                 self.assertEqual(execution._data["generation"], before + 1)
                 self.assertTrue(execution.verify()["valid"])
 
+    def test_durable_publication_replay_conflict_and_restore(self):
+        publication_id = f"{time.time_ns():064x}"
+        self.assertIsNone(self.client.publication(publication_id))
+        with self.client.execution_pool(self.base, concurrency=1) as pool:
+            with pool.acquire() as execution:
+                (execution.path / "report.txt").write_text("completed")
+                saved = execution.publish(publication_id, "b" * 64, {"report": "report.txt"})
+                (execution.path / "report.txt").write_text("unpublished later work")
+                replay = execution.publish(publication_id, "b" * 64, {"ignored": True})
+                self.assertEqual(replay.id, saved.id)
+                self.assertEqual(replay.manifest["publication"]["result"], {"report": "report.txt"})
+                with self.assertRaises(RametError) as caught:
+                    execution.publish(publication_id, "c" * 64, {})
+                self.assertEqual(caught.exception.status, 409)
+        found = self.client.publication(publication_id)
+        self.assertEqual(found.id, saved.id)
+        with self.client.execution_pool(found, concurrency=1) as pool:
+            with pool.acquire() as execution:
+                self.assertEqual((execution.path / "report.txt").read_text(), "completed")
+        with self.assertRaises(RametError) as caught:
+            self.client._request("DELETE", "/v1/snapshots/" + saved.id)
+        self.assertEqual(caught.exception.status, 409)
+
     def test_error_correlation_and_capabilities(self):
         self.assertIn(self.client.capabilities()["backend"], ("copy", "lazy"))
         with self.assertRaises(RametError) as caught:

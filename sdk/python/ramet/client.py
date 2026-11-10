@@ -50,8 +50,15 @@ class OutcomeUnknownError(RuntimeError):
         self.operation_id, self.method, self.path = operation_id, method, path
 
 
+class PublicationUnknownError(RuntimeError):
+    """Publication may have committed. Resolve its durable ID before continuing."""
+    def __init__(self, publication_id: str):
+        super().__init__(f"Publication {publication_id} outcome unknown; resolve its durable ID")
+        self.publication_id = publication_id
+
+
 def _unresolved(error: BaseException | None) -> bool:
-    return isinstance(error, OutcomeUnknownError) or (
+    return isinstance(error, (OutcomeUnknownError, PublicationUnknownError)) or (
         isinstance(error, RametError) and error.code in {
             "operation_pending", "operation_expired", "operation_session_changed",
             "operation_result_unavailable", "operation_conflict",
@@ -141,6 +148,17 @@ class Ramet:
 
     def snapshots(self) -> list[Snapshot]:
         return [Snapshot(**s) for s in self._request("GET", "/v1/snapshots")]
+
+    def publication(self, publication_id: str) -> Snapshot | None:
+        """Resolve a durable publication; None is not proof a live writer stopped."""
+        if not re.fullmatch(r"[0-9a-f]{64}", publication_id):
+            raise ValueError("publication_id must be SHA-256 hex")
+        try:
+            return Snapshot(**self._request("GET", "/v1/publications/" + publication_id))
+        except RametError as error:
+            if error.status == 404 and error.code == "not_found":
+                return None
+            raise
 
     def execution_pool(self, base: Snapshot | str, concurrency: int = 8, *,
                        lease_seconds: int = 900, operation_id: str | None = None) -> ExecutionPool:
@@ -343,6 +361,34 @@ class Execution:
         with self._lock:
             self.stop_runtime()
             return Snapshot(**self._action("checkpoint", operation_id=operation_id))
+
+    def publish(self, publication_id: str, request_digest: str, result: Any, *,
+                mode: str = "checkpoint") -> Snapshot:
+        """Capture files and a JSON tool result under a durable logical ID.
+
+        Persist/derive the ID before running the tool. Reusing it returns the
+        original snapshot, not the execution's current files. No automatic retry.
+        """
+        if not re.fullmatch(r"[0-9a-f]{64}", publication_id) or not re.fullmatch(r"[0-9a-f]{64}", request_digest):
+            raise ValueError("publication ID and request digest must be SHA-256 hex")
+        encoded = json.dumps(result, allow_nan=False)
+        if len(encoded.encode()) > 65536 or mode not in ("checkpoint", "promotion"):
+            raise ValueError("result must be at most 64 KiB and mode checkpoint or promotion")
+        with self._lock:
+            self.stop_runtime()
+            self.heartbeat()
+            path = self.pool._path + "/executions/" + quote(self.id, safe="") + "/publish"
+            body = {"lease": self._data["lease"], "generation": self._data["generation"],
+                    "mode": mode, "publication": {"id": publication_id,
+                    "request_digest": request_digest, "result": result}}
+            try:
+                return Snapshot(**self.pool.client._request("POST", path, body))
+            except RametError as error:
+                if error.status == 408 or error.status >= 500:
+                    raise PublicationUnknownError(publication_id) from error
+                raise
+            except (OSError, HTTPException, ValueError, TypeError) as error:
+                raise PublicationUnknownError(publication_id) from error
 
     def preview_promotion(self) -> Mapping[str, Any]:
         """Inspect a quiesced execution; publishes no snapshot or content."""

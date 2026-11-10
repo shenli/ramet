@@ -104,6 +104,15 @@ for that policy. A full `checkpoint()` preserves supported files regardless of
 ephemeral/rebuildable classifications. Preparation itself only changes local
 files; call capture or promotion explicitly to persist them.
 
+## Recover tool progress without losing a publication
+
+When a tool finishes, publish its files and JSON result before advancing the
+harness checkpoint. The [tool recovery guide](tool-recovery.md) shows how a stable
+publication ID resolves a save whose acknowledgment was lost, including after
+worker replacement. The [LangGraph example](../examples/langgraph_recovery/README.md)
+adds crash injection around these boundaries. A plain snapshot ID written to
+your database after capture does not, by itself, close that acknowledgment gap.
+
 ## Record the session and restore elsewhere
 
 After publishing the workspace, store a record in your application's database:
