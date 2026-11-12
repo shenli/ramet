@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 # Separate, unmodified AGPL-3.0 services; not linked into Ramet.
-FROM golang:1.26.9-bookworm AS server-build
+FROM golang:1.27.2-bookworm AS server-build
 RUN git clone https://github.com/minio/minio.git /src && \
     cd /src && git checkout 9e49d5e7a648f00e26f2246f4dc28e6b07f8c84a && \
     CGO_ENABLED=0 go build -trimpath -o /out/minio .
 
-FROM golang:1.26.9-bookworm AS client-build
+FROM golang:1.27.2-bookworm AS client-build
 RUN git clone https://github.com/minio/mc.git /src && \
     cd /src && git checkout d6541ea280b73a834b64d4097e21f2be77676104 && \
     CGO_ENABLED=0 go build -trimpath -o /out/mc .
